@@ -54,12 +54,6 @@ class MocClientTest {
     @DisplayName("基本的な初期化テスト")
     class InitializationTests {
         @Test
-        @DisplayName("baseURLが正しく設定されていること")
-        void testGetBaseUrl() {
-            assertEquals(BASE_URL, client.getBaseUrl(), "baseURLが正しく設定されていない");
-        }
-
-        @Test
         @DisplayName("初期状態ではトークンがnullであること")
         void testInitialTokensAreNull() {
             assertNull(client.getAccessToken(), "初期状態でアクセストークンはnullのはず");

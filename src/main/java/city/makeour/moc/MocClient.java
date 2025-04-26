@@ -10,7 +10,6 @@ import city.makeour.ngsi.v2.model.ListEntitiesResponse;
 import city.makeour.ngsi.v2.model.RetrieveApiResourcesResponse;
 
 public class MocClient {
-    private final String baseUrl;
     private String accessToken;
     private String refreshToken;
     private String fiwareService;
@@ -18,10 +17,10 @@ public class MocClient {
     private final ApiEntryPointApi apiEntryPoint;
     private final EntitiesApi entitiesApi;
 
-    public MocClient(String baseUrl) throws ApiException {
-        this.baseUrl = baseUrl;
+    public MocClient(String host, String basePath) throws ApiException {
         this.apiClient = new ApiClient();
-        this.apiClient.setBasePath(baseUrl);
+        this.apiClient.setHost(host);
+        this.apiClient.setBasePath(basePath);
         this.apiEntryPoint = new ApiEntryPointApi(apiClient);
         this.entitiesApi = new EntitiesApi(apiClient);
         validateConnection();
@@ -30,7 +29,7 @@ public class MocClient {
     // テスト用のコンストラクタ
     MocClient(String baseUrl, ApiClient apiClient, ApiEntryPointApi apiEntryPoint, EntitiesApi entitiesApi)
             throws ApiException {
-        this.baseUrl = baseUrl;
+        apiClient.setBasePath(baseUrl);
         this.apiClient = apiClient;
         this.apiEntryPoint = apiEntryPoint;
         this.entitiesApi = entitiesApi;
@@ -50,10 +49,6 @@ public class MocClient {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
-    }
-
-    public String getBaseUrl() {
-        return baseUrl;
     }
 
     public String getAccessToken() {
