@@ -12,7 +12,6 @@ import city.makeour.ngsi.v2.model.RetrieveApiResourcesResponse;
 public class MocClient {
     private String accessToken;
     private String refreshToken;
-    private String fiwareService;
     private final ApiClient apiClient;
     private final ApiEntryPointApi apiEntryPoint;
     private final EntitiesApi entitiesApi;
@@ -65,17 +64,7 @@ public class MocClient {
      * @param fiwareService テナント名
      */
     public void setFiwareService(String fiwareService) {
-        this.fiwareService = fiwareService;
-        // TODO: ApiClientの正しいヘッダー設定方法を調査する
-    }
-
-    /**
-     * 設定されているFiware-Serviceヘッダの値を取得します
-     *
-     * @return テナント名
-     */
-    public String getFiwareService() {
-        return fiwareService;
+        throw new UnsupportedOperationException("Fiware-Service header is not supported");
     }
 
     /**
