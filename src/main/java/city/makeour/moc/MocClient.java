@@ -16,6 +16,10 @@ public class MocClient {
     private final ApiEntryPointApi apiEntryPoint;
     private final EntitiesApi entitiesApi;
 
+    public MocClient(String host) throws ApiException {
+        this(host, "/v2");
+    }
+
     public MocClient(String host, String basePath) throws ApiException {
         this.apiClient = new ApiClient();
         this.apiClient.setHost(host);

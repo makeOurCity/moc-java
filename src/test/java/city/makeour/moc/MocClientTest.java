@@ -117,6 +117,19 @@ class MocClientTest {
     }
 
     @Nested
+    @DisplayName("手動実装テスト")
+    class ManualOperationTests {
+        @Test
+        @DisplayName("Fiware-Serviceヘッダの設定")
+        void testSetFiwareService() throws ApiException {
+            MocClient client = new MocClient("orion.sandbox.makeour.city");
+
+            System.out.println(client.listEntities());
+            assertEquals("hoge", "fuga");
+        }
+    }
+
+    @Nested
     @DisplayName("エンティティ操作テスト")
     class EntityOperationTests {
         @Test
