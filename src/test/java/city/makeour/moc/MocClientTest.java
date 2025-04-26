@@ -7,6 +7,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,7 +19,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import city.makeour.ngsi.v2.api.ApiEntryPointApi;
+import city.makeour.ngsi.v2.api.EntitiesApi;
 import city.makeour.ngsi.v2.invoker.ApiException;
+import city.makeour.ngsi.v2.model.ListEntitiesResponse;
 import city.makeour.ngsi.v2.model.RetrieveApiResourcesResponse;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,6 +33,9 @@ class MocClientTest {
     private ApiEntryPointApi mockApiEntryPoint;
 
     @Mock
+    private EntitiesApi mockEntitiesApi;
+
+    @Mock
     private RetrieveApiResourcesResponse mockResponse;
 
     private MocClient client;
@@ -35,7 +43,7 @@ class MocClientTest {
     @BeforeEach
     void setUp() throws ApiException {
         when(mockApiEntryPoint.retrieveAPIResources()).thenReturn(mockResponse);
-        client = new MocClient(BASE_URL, mockApiEntryPoint);
+        client = new MocClient(BASE_URL, mockApiEntryPoint, mockEntitiesApi);
     }
 
     @Nested
@@ -90,7 +98,7 @@ class MocClientTest {
             when(mockApiEntryPoint.retrieveAPIResources()).thenReturn(null);
 
             ApiException exception = assertThrows(ApiException.class,
-                    () -> new MocClient(BASE_URL, mockApiEntryPoint),
+                    () -> new MocClient(BASE_URL, mockApiEntryPoint, mockEntitiesApi),
                     "APIリソース取得失敗時にApiExceptionがスローされるべき");
 
             assertEquals("Failed to retrieve API resources", exception.getMessage());
@@ -103,8 +111,52 @@ class MocClientTest {
             when(mockApiEntryPoint.retrieveAPIResources()).thenThrow(expectedException);
 
             ApiException exception = assertThrows(ApiException.class,
-                    () -> new MocClient(BASE_URL, mockApiEntryPoint),
+                    () -> new MocClient(BASE_URL, mockApiEntryPoint, mockEntitiesApi),
                     "API呼び出しエラー時にApiExceptionがスローされるべき");
+
+            assertEquals(expectedException, exception);
+        }
+    }
+
+    @Nested
+    @DisplayName("エンティティ操作テスト")
+    class EntityOperationTests {
+        @Test
+        @DisplayName("エンティティ一覧の取得")
+        void testListEntities() throws ApiException {
+            // テストデータの準備
+            ListEntitiesResponse entity1 = new ListEntitiesResponse().id("entity1").type("testType");
+            ListEntitiesResponse entity2 = new ListEntitiesResponse().id("entity2").type("testType");
+            List<ListEntitiesResponse> expectedEntities = Arrays.asList(entity1, entity2);
+
+            // モックの設定
+            when(mockEntitiesApi.listEntities(null, null, null, null, null, null, null, null,
+                    null, null, null, null, null, null, null))
+                    .thenReturn(expectedEntities);
+
+            // テスト実行
+            List<ListEntitiesResponse> actualEntities = client.listEntities();
+
+            // 検証
+            assertEquals(expectedEntities, actualEntities, "取得したエンティティリストが期待値と一致しない");
+            verify(mockEntitiesApi, times(1))
+                    .listEntities(null, null, null, null, null, null, null, null,
+                            null, null, null, null, null, null, null);
+        }
+
+        @Test
+        @DisplayName("エンティティ一覧取得時のエラー処理")
+        void testListEntitiesError() throws ApiException {
+            // モックの設定
+            ApiException expectedException = new ApiException("Failed to list entities");
+            when(mockEntitiesApi.listEntities(null, null, null, null, null, null, null, null,
+                    null, null, null, null, null, null, null))
+                    .thenThrow(expectedException);
+
+            // テスト実行と検証
+            ApiException exception = assertThrows(ApiException.class,
+                    () -> client.listEntities(),
+                    "エンティティ一覧取得失敗時にApiExceptionがスローされるべき");
 
             assertEquals(expectedException, exception);
         }
