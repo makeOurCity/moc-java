@@ -6,7 +6,6 @@ import city.makeour.ngsi.v2.api.ApiEntryPointApi;
 import city.makeour.ngsi.v2.api.EntitiesApi;
 import city.makeour.ngsi.v2.invoker.ApiClient;
 import city.makeour.ngsi.v2.invoker.ApiException;
-import city.makeour.ngsi.v2.invoker.Configuration;
 import city.makeour.ngsi.v2.model.ListEntitiesResponse;
 import city.makeour.ngsi.v2.model.RetrieveApiResourcesResponse;
 
@@ -21,16 +20,18 @@ public class MocClient {
 
     public MocClient(String baseUrl) throws ApiException {
         this.baseUrl = baseUrl;
-        this.apiClient = Configuration.getDefaultApiClient();
+        this.apiClient = new ApiClient();
+        this.apiClient.setBasePath(baseUrl);
         this.apiEntryPoint = new ApiEntryPointApi(apiClient);
         this.entitiesApi = new EntitiesApi(apiClient);
         validateConnection();
     }
 
     // テスト用のコンストラクタ
-    MocClient(String baseUrl, ApiEntryPointApi apiEntryPoint, EntitiesApi entitiesApi) throws ApiException {
+    MocClient(String baseUrl, ApiClient apiClient, ApiEntryPointApi apiEntryPoint, EntitiesApi entitiesApi)
+            throws ApiException {
         this.baseUrl = baseUrl;
-        this.apiClient = Configuration.getDefaultApiClient();
+        this.apiClient = apiClient;
         this.apiEntryPoint = apiEntryPoint;
         this.entitiesApi = entitiesApi;
         validateConnection();

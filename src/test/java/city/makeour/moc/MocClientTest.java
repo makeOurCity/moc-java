@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import city.makeour.ngsi.v2.api.ApiEntryPointApi;
 import city.makeour.ngsi.v2.api.EntitiesApi;
+import city.makeour.ngsi.v2.invoker.ApiClient;
 import city.makeour.ngsi.v2.invoker.ApiException;
 import city.makeour.ngsi.v2.model.ListEntitiesResponse;
 import city.makeour.ngsi.v2.model.RetrieveApiResourcesResponse;
@@ -28,6 +29,9 @@ import city.makeour.ngsi.v2.model.RetrieveApiResourcesResponse;
 @DisplayName("MocClient Tests")
 class MocClientTest {
     private static final String BASE_URL = "http://example.com";
+
+    @Mock
+    private ApiClient mockApiClient;
 
     @Mock
     private ApiEntryPointApi mockApiEntryPoint;
@@ -43,7 +47,7 @@ class MocClientTest {
     @BeforeEach
     void setUp() throws ApiException {
         when(mockApiEntryPoint.retrieveAPIResources()).thenReturn(mockResponse);
-        client = new MocClient(BASE_URL, mockApiEntryPoint, mockEntitiesApi);
+        client = new MocClient(BASE_URL, mockApiClient, mockApiEntryPoint, mockEntitiesApi);
     }
 
     @Nested
@@ -98,7 +102,7 @@ class MocClientTest {
             when(mockApiEntryPoint.retrieveAPIResources()).thenReturn(null);
 
             ApiException exception = assertThrows(ApiException.class,
-                    () -> new MocClient(BASE_URL, mockApiEntryPoint, mockEntitiesApi),
+                    () -> new MocClient(BASE_URL, mockApiClient, mockApiEntryPoint, mockEntitiesApi),
                     "APIリソース取得失敗時にApiExceptionがスローされるべき");
 
             assertEquals("Failed to retrieve API resources", exception.getMessage());
@@ -111,7 +115,7 @@ class MocClientTest {
             when(mockApiEntryPoint.retrieveAPIResources()).thenThrow(expectedException);
 
             ApiException exception = assertThrows(ApiException.class,
-                    () -> new MocClient(BASE_URL, mockApiEntryPoint, mockEntitiesApi),
+                    () -> new MocClient(BASE_URL, mockApiClient, mockApiEntryPoint, mockEntitiesApi),
                     "API呼び出しエラー時にApiExceptionがスローされるべき");
 
             assertEquals(expectedException, exception);
