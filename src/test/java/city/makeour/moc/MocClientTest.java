@@ -122,7 +122,7 @@ class MocClientTest {
         @Test
         @DisplayName("Fiware-Serviceヘッダの設定")
         void testSetFiwareService() throws ApiException {
-            MocClient client = new MocClient("orion.sandbox.makeour.city");
+            MocClient client = new MocClient();
 
             System.out.println(client.listEntities());
             assertEquals("hoge", "fuga");

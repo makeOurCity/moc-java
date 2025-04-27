@@ -16,14 +16,13 @@ public class MocClient {
     private final ApiEntryPointApi apiEntryPoint;
     private final EntitiesApi entitiesApi;
 
-    public MocClient(String host) throws ApiException {
-        this(host, "/v2");
+    public MocClient() throws ApiException {
+        this("https://orion.sandbox.makeour.city/v2");
     }
 
-    public MocClient(String host, String basePath) throws ApiException {
+    public MocClient(String baseUri) throws ApiException {
         this.apiClient = new ApiClient();
-        this.apiClient.setHost(host);
-        this.apiClient.setBasePath(basePath);
+        this.apiClient.updateBaseUri(baseUri);
         this.apiEntryPoint = new ApiEntryPointApi(apiClient);
         this.entitiesApi = new EntitiesApi(apiClient);
         validateConnection();
@@ -32,11 +31,15 @@ public class MocClient {
     // テスト用のコンストラクタ
     MocClient(String baseUrl, ApiClient apiClient, ApiEntryPointApi apiEntryPoint, EntitiesApi entitiesApi)
             throws ApiException {
-        apiClient.setBasePath(baseUrl);
+        apiClient.updateBaseUri(baseUrl);
         this.apiClient = apiClient;
         this.apiEntryPoint = apiEntryPoint;
         this.entitiesApi = entitiesApi;
         validateConnection();
+    }
+
+    public void updateBaseUri(String baseUrl) {
+        apiClient.updateBaseUri(baseUrl);
     }
 
     private void validateConnection() throws ApiException {
