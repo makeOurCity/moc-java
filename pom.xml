@@ -59,7 +59,7 @@
     <dependency>
       <groupId>com.github.makeOurCity</groupId>
       <artifactId>ngsiv2-java</artifactId>
-      <version>v0.0.1</version> <!-- ①で作ったタグ -->
+      <version>0.0.2</version> <!-- ①で作ったタグ -->
     </dependency>
   </dependencies>
 
