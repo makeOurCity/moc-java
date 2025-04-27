@@ -9,7 +9,7 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitia
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
 
-public class FetchCognitoToken {
+public class FetchCognitoToken implements TokenFetcherInterface {
 
     protected CognitoIdentityProviderClient client;
     protected String cognitoUserPoolId;
@@ -19,7 +19,7 @@ public class FetchCognitoToken {
     protected String username;
     protected String password;
 
-    public void construct(String cognitoUserPoolId, String cognitoClientId) {
+    public FetchCognitoToken(String cognitoUserPoolId, String cognitoClientId) {
         this.cognitoClientId = cognitoClientId;
         this.cognitoUserPoolId = cognitoUserPoolId;
         this.refreshToken = null;
