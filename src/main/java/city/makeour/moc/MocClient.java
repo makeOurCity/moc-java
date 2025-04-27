@@ -1,35 +1,25 @@
 package city.makeour.moc;
 
+import city.makeour.ngsi.v2.api.EntitiesApi;
+import city.makeour.ngsi.v2.invoker.ApiClient;
+
 public class MocClient {
-    private final String basePath;
-    private final HttpClient httpClient;
+    protected ApiClient apiClient;
+
+    protected EntitiesApi entitiesApi;
 
     public MocClient() {
         this("https://orion.sandbox.makeour.city");
     }
 
     public MocClient(String basePath) {
-        this.basePath = basePath;
-        this.httpClient = createHttpClient();
+        this.apiClient = new ApiClient();
+        this.apiClient.setBasePath(basePath);
+
+        this.entitiesApi = new EntitiesApi(this.apiClient);
     }
 
-    protected HttpClient createHttpClient() {
-        return new HttpClient(basePath);
-    }
-
-    public HttpClient getHttpClient() {
-        return httpClient;
-    }
-
-    public static class HttpClient {
-        private final String basePath;
-
-        public HttpClient(String basePath) {
-            this.basePath = basePath;
-        }
-
-        public String getBasePath() {
-            return basePath;
-        }
+    public EntitiesApi entities() {
+        return this.entitiesApi;
     }
 }
