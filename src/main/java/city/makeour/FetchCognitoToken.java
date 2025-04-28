@@ -5,8 +5,12 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import software.amazon.awssdk.awscore.defaultsmode.DefaultsMode;
@@ -103,7 +107,10 @@ public class FetchCognitoToken implements TokenFetcherInterface {
 
             // Step 3: Calculate proof and respond to challenge
             byte[] key = calculateSRPKey(a, B, salt, userIdForSRP);
-            String dateNow = String.valueOf(System.currentTimeMillis());
+            // Format timestamp as required by Cognito
+            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss 'UTC' yyyy", Locale.US);
+            String dateNow = now.format(formatter);
 
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             digest.update(cognitoUserPoolId.split("_")[1].getBytes(StandardCharsets.UTF_8));
@@ -133,7 +140,7 @@ public class FetchCognitoToken implements TokenFetcherInterface {
             return result.idToken();
 
         } catch (Exception e) {
-            throw new RuntimeException("SRP authentication failed", e);
+            throw new RuntimeException("SRP authentication failed" + e.getMessage(), e);
         }
     }
 
