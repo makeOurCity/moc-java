@@ -3,11 +3,13 @@ package city.makeour;
 import java.util.HashMap;
 import java.util.Map;
 
+import software.amazon.awssdk.awscore.defaultsmode.DefaultsMode;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthRequest;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthResponse;
 
 public class FetchCognitoToken implements TokenFetcherInterface {
 
@@ -23,7 +25,10 @@ public class FetchCognitoToken implements TokenFetcherInterface {
         this.cognitoClientId = cognitoClientId;
         this.cognitoUserPoolId = cognitoUserPoolId;
         this.refreshToken = null;
-        // this.client = CognitoIdentityProviderClient.getInstance();
+        this.client = CognitoIdentityProviderClient.builder()
+                .defaultsMode(DefaultsMode.STANDARD)
+                .region(Region.AP_NORTHEAST_1)
+                .build();
     }
 
     public void setAuthParameters(String username, String password) {
@@ -32,32 +37,32 @@ public class FetchCognitoToken implements TokenFetcherInterface {
     }
 
     public String fetchToken() {
-        AdminInitiateAuthRequest authRequest = null;
+        InitiateAuthRequest authRequest = null;
 
         if (this.refreshToken != null) {
             Map<String, String> authParameters = new HashMap<>();
             authParameters.put("REFRESH_TOKEN", this.refreshToken);
 
-            authRequest = AdminInitiateAuthRequest.builder()
+            authRequest = InitiateAuthRequest.builder()
                     .clientId(this.cognitoClientId)
-                    .userPoolId(this.cognitoUserPoolId)
+                    // .userPoolId(this.cognitoUserPoolId)
                     .authParameters(authParameters)
-                    .authFlow(AuthFlowType.REFRESH_TOKEN_AUTH)
+                    .authFlow(AuthFlowType.USER_SRP_AUTH)
                     .build();
         } else {
             Map<String, String> authParameters = new HashMap<>();
             authParameters.put("USERNAME", username);
             authParameters.put("PASSWORD", password);
 
-            authRequest = AdminInitiateAuthRequest.builder()
+            authRequest = InitiateAuthRequest.builder()
                     .clientId(this.cognitoClientId)
-                    .userPoolId(this.cognitoUserPoolId)
+                    // .userPoolId(this.cognitoUserPoolId)
                     .authParameters(authParameters)
-                    .authFlow(AuthFlowType.ADMIN_USER_PASSWORD_AUTH)
+                    .authFlow(AuthFlowType.USER_SRP_AUTH)
                     .build();
         }
 
-        AdminInitiateAuthResponse response = this.client.adminInitiateAuth(authRequest);
+        InitiateAuthResponse response = this.client.initiateAuth(authRequest);
         AuthenticationResultType result = response.authenticationResult();
 
         this.refreshToken = result.refreshToken();
