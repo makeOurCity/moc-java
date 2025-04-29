@@ -57,26 +57,40 @@ public class AuthenticationHelper {
     public byte[] getPasswordAuthenticationKey(
             String poolName, String username, String password, String srpBHex, String saltHex, String secretBlock) {
 
-        BigInteger B = new BigInteger(srpBHex, 16);
+        BigInteger B = new BigInteger(1, hexStringToByteArray(srpBHex));
         if (B.mod(N).equals(BigInteger.ZERO)) {
             throw new IllegalStateException("Invalid server B value");
         }
 
         BigInteger u = computeU(A, B);
-        BigInteger salt = new BigInteger(saltHex, 16);
-
+        BigInteger salt = new BigInteger(1, hexStringToByteArray(saltHex));
         BigInteger x = calculateX(poolName, username, password, salt);
-        BigInteger S = (B.subtract(k.multiply(g.modPow(x, N)))).mod(N)
-                .modPow(a.add(u.multiply(x)), N)
-                .mod(N);
+
+        BigInteger base = B.subtract(k.multiply(g.modPow(x, N))).mod(N);
+        BigInteger exp = a.add(u.multiply(x));
+        BigInteger S = base.modPow(exp, N).mod(N);
 
         return computeHKDF(padHex(S), u.toByteArray());
+    }
+
+    private static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                    + Character.digit(s.charAt(i + 1), 16));
+        }
+        return data;
     }
 
     public String calculateSignature(String userIdForSRP, String secretBlock, String timestamp, byte[] key) {
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(key, "HmacSHA256"));
+
+            String cleanedSecretBlock = secretBlock.trim(); // 余計な改行やスペース除去
+            byte[] secretBlockBytes = Base64.getDecoder().decode(cleanedSecretBlock);
+            System.out.println("secretBlockBytes.length = " + secretBlockBytes.length);
 
             byte[] message = concatBytes(
                     poolName.getBytes(StandardCharsets.UTF_8),
@@ -88,6 +102,14 @@ public class AuthenticationHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
     }
 
     public String getCurrentFormattedTimestamp() {
