@@ -58,7 +58,8 @@ public class CognitoAuthenticator {
         String userIdForSRP = challengeParameters.get("USER_ID_FOR_SRP");
 
         // ステップ4: パスワード認証キー計算
-        byte[] passwordAuthKey = authHelper.getPasswordAuthenticationKey(username, password, srpB, salt, secretBlock);
+        byte[] passwordAuthKey = authHelper.getPasswordAuthenticationKey(userPoolId, username, password, srpB, salt,
+                secretBlock);
 
         // ステップ5: 署名生成
         String timestamp = authHelper.getCurrentFormattedTimestamp();

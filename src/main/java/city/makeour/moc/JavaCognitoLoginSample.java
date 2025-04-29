@@ -53,7 +53,8 @@ public class JavaCognitoLoginSample {
         String userIdForSRP = challengeParams.get("USER_ID_FOR_SRP");
 
         // SRP計算
-        byte[] passwordKey = authHelper.getPasswordAuthenticationKey(username, password, srpB, salt, secretBlock);
+        byte[] passwordKey = authHelper.getPasswordAuthenticationKey(userPoolId, username, password, srpB, salt,
+                secretBlock);
         String timestamp = authHelper.getCurrentFormattedTimestamp();
         String signature = authHelper.calculateSignature(userIdForSRP, secretBlock, timestamp, passwordKey);
 

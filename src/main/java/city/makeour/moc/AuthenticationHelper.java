@@ -55,7 +55,7 @@ public class AuthenticationHelper {
     }
 
     public byte[] getPasswordAuthenticationKey(
-            String username, String password, String srpBHex, String saltHex, String secretBlock) {
+            String poolName, String username, String password, String srpBHex, String saltHex, String secretBlock) {
 
         BigInteger B = new BigInteger(srpBHex, 16);
         if (B.mod(N).equals(BigInteger.ZERO)) {
@@ -65,7 +65,7 @@ public class AuthenticationHelper {
         BigInteger u = computeU(A, B);
         BigInteger salt = new BigInteger(saltHex, 16);
 
-        BigInteger x = calculateX(username, password, salt);
+        BigInteger x = calculateX(poolName, username, password, salt);
         BigInteger S = (B.subtract(k.multiply(g.modPow(x, N)))).mod(N)
                 .modPow(a.add(u.multiply(x)), N)
                 .mod(N);
@@ -124,17 +124,22 @@ public class AuthenticationHelper {
         }
     }
 
-    private static BigInteger calculateX(String username, String password, BigInteger salt) {
+    private BigInteger calculateX(String poolName, String username, String password, BigInteger salt) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            String message = username + ":" + password;
-            byte[] userIdHash = digest.digest(message.getBytes(StandardCharsets.UTF_8));
 
+            // Step1: (poolName + username + ":" + password) をSHA-256
+            String userIdHashInput = poolName + username + ":" + password;
+            byte[] userIdHash = digest.digest(userIdHashInput.getBytes(StandardCharsets.UTF_8));
+
+            // Step2: (saltバイト列 + userIdHash) をSHA-256
             digest.reset();
             digest.update(salt.toByteArray());
             digest.update(userIdHash);
 
-            return new BigInteger(1, digest.digest());
+            byte[] xHash = digest.digest();
+
+            return new BigInteger(1, xHash);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
