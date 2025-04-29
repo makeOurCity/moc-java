@@ -1,7 +1,5 @@
 package city.makeour.moc;
 
-import city.makeour.FetchCognitoToken;
-import city.makeour.TokenFetcherInterface;
 import city.makeour.ngsi.v2.api.EntitiesApi;
 import city.makeour.ngsi.v2.invoker.ApiClient;
 

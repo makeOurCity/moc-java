@@ -36,7 +36,7 @@
     <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-api</artifactId>
-        <version>5.10.1</version> <!-- バージョンは適宜 -->
+        <version>5.10.1</version>
         <scope>test</scope>
     </dependency>
     <dependency>
@@ -59,7 +59,12 @@
     <dependency>
       <groupId>com.github.makeOurCity</groupId>
       <artifactId>ngsiv2-java</artifactId>
-      <version>0.0.2</version> <!-- ①で作ったタグ -->
+      <version>0.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>1.70</version> 
     </dependency>
   </dependencies>
 

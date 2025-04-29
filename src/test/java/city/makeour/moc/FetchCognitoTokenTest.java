@@ -1,4 +1,4 @@
-package city.makeour;
+package city.makeour.moc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -139,7 +139,7 @@ class FetchCognitoTokenTest {
                 "ap-northeast-1_nXSBLO7v6",
                 "3d7d0piq75halieshbi7o8keca");
 
-        fetcher.setAuthParameters("ushio.s@gmail.com", "");
+        fetcher.setAuthParameters("ushio.s@gmail.com", "ushioshugo");
         fetcher.fetchToken();
     }
 }
