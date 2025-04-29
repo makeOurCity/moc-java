@@ -19,7 +19,7 @@ public class JavaCognitoLoginSample {
         String userPoolId = "ap-northeast-1_nXSBLO7v6";
         String clientId = "3d7d0piq75halieshbi7o8keca";
         String username = "ushio.s@gmail.com"; // ここはUUIDじゃない、メールアドレス！
-        String password = "ushioshugo";
+        String password = "";
 
         // クライアント作成
         CognitoIdentityProviderClient client = CognitoIdentityProviderClient.builder()
