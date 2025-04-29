@@ -24,7 +24,7 @@ public class CognitoAuthenticationHelperTest {
         String userPoolId = "ap-northeast-1_nXSBLO7v6";
         String clientId = "3d7d0piq75halieshbi7o8keca";
         String username = "ushio.s@gmail.com";
-        String password = "ushioshugo";
+        String password = "";
 
         CognitoAuthenticator authenticator = new CognitoAuthenticator(
                 Region.AP_NORTHEAST_1,
