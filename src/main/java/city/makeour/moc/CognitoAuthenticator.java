@@ -69,7 +69,7 @@ public class CognitoAuthenticator {
         challengeResponses.put("PASSWORD_CLAIM_SECRET_BLOCK", secretBlock);
         challengeResponses.put("PASSWORD_CLAIM_SIGNATURE", signature);
         challengeResponses.put("TIMESTAMP", timestamp);
-        challengeResponses.put("USERNAME", username);
+        challengeResponses.put("USERNAME", userIdForSRP);
 
         RespondToAuthChallengeRequest challengeRequest = RespondToAuthChallengeRequest.builder()
                 .challengeName(ChallengeNameType.PASSWORD_VERIFIER)
