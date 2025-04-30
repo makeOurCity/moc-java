@@ -81,6 +81,8 @@ public class Exec {
             challengeResponses.put("PASSWORD_CLAIM_SIGNATURE", signature);
             challengeResponses.put("TIMESTAMP", timestamp);
 
+            System.out.println("challengeResponses = " + challengeResponses);
+
             RespondToAuthChallengeRequest respondRequest = RespondToAuthChallengeRequest.builder()
                     .challengeName(ChallengeNameType.PASSWORD_VERIFIER)
                     .clientId(clientId)
@@ -149,7 +151,8 @@ public class Exec {
                 String saltHex,
                 String secretBlock) {
             // BigInteger B = new BigInteger(1, hexStringToByteArray(srpBHex));
-            srpBHex = "7fbdbae7b2ba3f9eda5e48c8bb61f82fcc3d6ed1645947fa7512b718485ad98fd3f195192e1c6dcdaef988236f8c13944e37d11598342dad7671b4e0ca756ee4021a1ce7053aa5e9ab16955eafcf445ce3954fa3873df73c509f2c25e85d584f5b01d63a8f0cdaf6dfbca93965535d49650c4e956a6b34844e60f2a973012d83937b92493847e55de7b421adbca8ece7a5960b5987f7e5b4d1c4a4983255862e9c67748c16e219bfa519dfbb87e79d70d4dddf727b8e1cdcb2a4ed6a5673218e550f9ce30b1284bff95d760011794cd63c1bd6511113f0fd15003512ae134c3f996021328ff0dd847987b6f0387a8ae1c5cb458462757aacc97f2128a5548c44331ddaaf91f9bb8bff33c3a69bef3e4bbe9e851616958bf77e7ae3bae42d06dbbb158ad1a55a6df6d3b5a2ba863d6951c257394b28c22ed33f8d18bbfcc97f084952a620f8f0fabf8c107a01ae0800dff62c80764aee5733b8dca44eb5a14c2f3294cfef7883c35e31aa188319fe561a21a1b7d4a905864f9ce7dd58a100ccd3";
+            // srpBHex =
+            // "6472ea13e9cd1f054fb17c211f26831c47a615ca8c42cdab2893c1a015965c658b93c8324e90436eb6c6cf730ffd7db2200f716b74e340f9b2c02654362f99f1f78c610f6c0d4bc4996963063e4ca6af87f3516536fda0b0116695ec7a564ec9992f1b6e862e86c4f326d205d3c1accad76e41eca1e5a83ffdf8a58b3c5673f21a26f5cbc8452bf84945b5898ddb5a4b120ff09de4a7a63cbd7ec11f9601b90735c65b02075054e448a64ba7ebf826682e1a1e92990714b8725862bb6a6f0b1eb803ad13fddcac087a8b79a2402fc15421261caaad1db51fc3133469ef5db789af25baddb513986d5e5555683fe5d47f2e0c0e9eb048e81ff3dc372a9b862345f0a4ab0818f72d89f464959f22795b38347627e3fee375ac8fbc51ab8d31e438dac6926c7b1c690d32c5c6a75ee37e84886973d18cb8dcb75c3e835007df6ddcc91d13e4e99b6e291d7e9260ddcfbee8620ddc2f9fc7406369c5d085cc3ceba7207b376df8806a88c3a3ff404eba276298edb936111b41d0f9042c07581dd0e1";
             BigInteger B = new BigInteger(1, hexStringToByteArray(srpBHex));
             if (B.mod(N).equals(BigInteger.ZERO)) {
                 throw new IllegalStateException("Invalid server B value");
@@ -173,7 +176,7 @@ public class Exec {
                 Mac mac = Mac.getInstance("HmacSHA256");
                 mac.init(new SecretKeySpec(key, "HmacSHA256"));
 
-                byte[] poolNameBytes = poolName.getBytes(StandardCharsets.UTF_8);
+                byte[] poolNameBytes = poolName.split("_")[1].getBytes(StandardCharsets.UTF_8);
                 byte[] userIdBytes = userIdForSRP.getBytes(StandardCharsets.UTF_8);
                 byte[] secretBlockBytes = Base64.getDecoder().decode(secretBlock);
                 byte[] timestampBytes = timestamp.getBytes(StandardCharsets.UTF_8);
@@ -189,7 +192,12 @@ public class Exec {
                 pos += secretBlockBytes.length;
                 System.arraycopy(timestampBytes, 0, message, pos, timestampBytes.length);
 
-                System.out.println("Java signature message = " + toHex(message));
+                System.out.println("Java message (userPoolName) = " + new String(poolNameBytes));
+                System.out.println("Java message (username)     = " + new String(userIdBytes));
+                System.out.println(
+                        "Java message (secretBlock)  = " + Base64.getEncoder().encodeToString(secretBlockBytes));
+                System.out.println("Java message (timestamp)    = " + new String(timestampBytes));
+                System.out.println("Java message (hex)          = " + toHex(message));
 
                 byte[] rawSignature = mac.doFinal(message);
                 return Base64.getEncoder().encodeToString(rawSignature);
@@ -199,7 +207,7 @@ public class Exec {
         }
 
         public String getCurrentFormattedTimestamp() {
-            SimpleDateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", java.util.Locale.US);
+            SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", java.util.Locale.US);
             format.setTimeZone(TimeZone.getTimeZone("UTC"));
             return format.format(new Date());
         }
