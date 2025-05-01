@@ -1,5 +1,8 @@
 package city.makeour.moc;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
 import city.makeour.ngsi.v2.api.EntitiesApi;
 import city.makeour.ngsi.v2.invoker.ApiClient;
 
@@ -29,7 +32,7 @@ public class MocClient {
         this.tokenFetcher = new FetchCognitoToken(cognitoUserPoolId, cognitoClientId);
     }
 
-    public void login(String username, String password) {
+    public void login(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException {
         if (this.tokenFetcher == null) {
             throw new IllegalStateException("MocClient is not initialized with Cognito auth info.");
         }
