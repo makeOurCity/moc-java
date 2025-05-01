@@ -81,7 +81,7 @@ public class SrpAuthenticationHelper {
     }
 
     public String getCurrentFormattedTimestamp() {
-        SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", java.util.Locale.US);
+        SimpleDateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", java.util.Locale.US);
         format.setTimeZone(TimeZone.getTimeZone("UTC"));
         return format.format(new Date());
     }
