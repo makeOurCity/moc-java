@@ -13,6 +13,8 @@ public class MocClient {
 
     protected TokenFetcherInterface tokenFetcher;
 
+    protected RefreshTokenStorageInterface refreshTokenStorage;
+
     public MocClient() {
         this("https://orion.sandbox.makeour.city");
     }
@@ -22,6 +24,7 @@ public class MocClient {
         this.apiClient.setBasePath(basePath);
 
         this.entitiesApi = new EntitiesApi(this.apiClient);
+        this.refreshTokenStorage = new RefreshTokenStorage();
     }
 
     public EntitiesApi entities() {
@@ -38,7 +41,9 @@ public class MocClient {
         }
 
         this.tokenFetcher.setAuthParameters(username, password);
-        this.setToken(this.tokenFetcher.fetchToken());
+        Token token = this.tokenFetcher.fetchToken();
+        this.setToken(token.getIdToken());
+        this.refreshTokenStorage.setRefreshToken(token.getRefreshToken());
     }
 
     public void setToken(String token) {

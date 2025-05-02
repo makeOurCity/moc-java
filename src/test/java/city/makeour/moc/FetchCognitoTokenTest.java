@@ -3,19 +3,26 @@ package city.makeour.moc;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 class FetchCognitoTokenTest {
 
+    // TODO: テストのスキップについてきちんと動作確認をする。
     @Test
+    @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USER_POOL_ID", matches = ".+")
+    @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_CLIENT_ID", matches = ".+")
+    @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USERNAME", matches = ".+")
+    @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_PASSWORD", matches = ".+")
     public void testFetchTokenWithSrpAuth() throws Exception {
-        String cognitoUserPoolId = "ap-northeast-1_nXSBLO7v6";
-        String cognitoClientId = "3d7d0piq75halieshbi7o8keca";
-        String username = "ushio.s@gmail.com";
-        String password = "";
+        String cognitoUserPoolId = System.getenv("TEST_COGNITO_USER_POOL_ID");
+        String cognitoClientId = System.getenv("TEST_COGNITO_CLIENT_ID");
+        String username = System.getenv("TEST_COGNITO_USERNAME");
+        String password = System.getenv("TEST_COGNITO_PASSWORD");
 
         FetchCognitoToken fetchCognitoToken = new FetchCognitoToken(cognitoUserPoolId, cognitoClientId);
         fetchCognitoToken.setAuthParameters(username, password);
-        String token = fetchCognitoToken.fetchTokenWithSrpAuth();
-        assertNotNull(token);
+        Token token = fetchCognitoToken.fetchTokenWithSrpAuth();
+        assertNotNull(token.getIdToken());
+        assertNotNull(token.getRefreshToken());
     }
 }

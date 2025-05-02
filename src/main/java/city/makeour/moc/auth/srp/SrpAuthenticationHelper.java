@@ -19,7 +19,6 @@ public class SrpAuthenticationHelper {
     private final LargeN N;
     private final SmallG g = new SmallG();
     private final SmallK k;
-    private final String userPoolId;
     private final String userPoolName;;
 
     public SrpAuthenticationHelper(String userPoolId) {
@@ -27,7 +26,6 @@ public class SrpAuthenticationHelper {
         this.a = new SmallA(N);
         this.A = new LargeA(N, this.a, this.g);
         this.k = new SmallK(N, g);
-        this.userPoolId = userPoolId;
         this.userPoolName = userPoolId.split("_")[1];
     }
 
@@ -80,12 +78,6 @@ public class SrpAuthenticationHelper {
         System.arraycopy(secretBlockBytes, 0, message, pos, secretBlockBytes.length);
         pos += secretBlockBytes.length;
         System.arraycopy(timestampBytes, 0, message, pos, timestampBytes.length);
-
-        String p = new String(poolNameBytes);
-        String u = new String(userIdBytes);
-        String s = new String(secretBlockBytes);
-        String t = new String(timestampBytes);
-        String hm = Helper.toHex(message);
 
         byte[] rawSignature = mac.doFinal(message);
         return Base64.getEncoder().encodeToString(rawSignature);

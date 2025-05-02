@@ -6,5 +6,5 @@ import java.security.NoSuchAlgorithmException;
 public interface TokenFetcherInterface {
     void setAuthParameters(String username, String password);
 
-    String fetchToken() throws InvalidKeyException, NoSuchAlgorithmException;
+    Token fetchToken() throws InvalidKeyException, NoSuchAlgorithmException;
 }

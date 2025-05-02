@@ -50,7 +50,7 @@ public class FetchCognitoToken implements TokenFetcherInterface {
         this.password = password;
     }
 
-    public String fetchTokenWithSrpAuth() throws InvalidKeyException, NoSuchAlgorithmException {
+    public Token fetchTokenWithSrpAuth() throws InvalidKeyException, NoSuchAlgorithmException {
         InitiateAuthRequest initiateAuthRequest = InitiateAuthRequest.builder()
                 .authFlow(AuthFlowType.USER_SRP_AUTH)
                 .clientId(this.cognitoClientId)
@@ -87,10 +87,10 @@ public class FetchCognitoToken implements TokenFetcherInterface {
         RespondToAuthChallengeResponse authChallengeResponse = cognitoClient.respondToAuthChallenge(respondRequest);
         AuthenticationResultType authResult = authChallengeResponse.authenticationResult();
 
-        return authResult.idToken();
+        return new Token(authResult.idToken(), authResult.refreshToken());
     }
 
-    public String fetchToken() throws InvalidKeyException, NoSuchAlgorithmException {
+    public Token fetchToken() throws InvalidKeyException, NoSuchAlgorithmException {
         return this.fetchTokenWithSrpAuth();
     }
 }
