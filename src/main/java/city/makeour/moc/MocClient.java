@@ -1,7 +1,8 @@
 package city.makeour.moc;
 
-import city.makeour.FetchCognitoToken;
-import city.makeour.TokenFetcherInterface;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
 import city.makeour.ngsi.v2.api.EntitiesApi;
 import city.makeour.ngsi.v2.invoker.ApiClient;
 
@@ -12,6 +13,8 @@ public class MocClient {
 
     protected TokenFetcherInterface tokenFetcher;
 
+    protected RefreshTokenStorageInterface refreshTokenStorage;
+
     public MocClient() {
         this("https://orion.sandbox.makeour.city");
     }
@@ -21,6 +24,7 @@ public class MocClient {
         this.apiClient.setBasePath(basePath);
 
         this.entitiesApi = new EntitiesApi(this.apiClient);
+        this.refreshTokenStorage = new RefreshTokenStorage();
     }
 
     public EntitiesApi entities() {
@@ -31,13 +35,15 @@ public class MocClient {
         this.tokenFetcher = new FetchCognitoToken(cognitoUserPoolId, cognitoClientId);
     }
 
-    public void login(String username, String password) {
+    public void login(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException {
         if (this.tokenFetcher == null) {
             throw new IllegalStateException("MocClient is not initialized with Cognito auth info.");
         }
 
         this.tokenFetcher.setAuthParameters(username, password);
-        this.setToken(this.tokenFetcher.fetchToken());
+        Token token = this.tokenFetcher.fetchToken();
+        this.setToken(token.getIdToken());
+        this.refreshTokenStorage.setRefreshToken(token.getRefreshToken());
     }
 
     public void setToken(String token) {
