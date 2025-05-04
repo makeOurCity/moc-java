@@ -4,15 +4,18 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariables;
 
 class FetchCognitoTokenTest {
 
     // TODO: テストのスキップについてきちんと動作確認をする。
     @Test
-    @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USER_POOL_ID", matches = ".+")
-    @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_CLIENT_ID", matches = ".+")
-    @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USERNAME", matches = ".+")
-    @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_PASSWORD", matches = ".+")
+    @EnabledIfEnvironmentVariables({
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USER_POOL_ID", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_CLIENT_ID", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USERNAME", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_PASSWORD", matches = ".*")
+    })
     public void testFetchTokenWithSrpAuth() throws Exception {
         String cognitoUserPoolId = System.getenv("TEST_COGNITO_USER_POOL_ID");
         String cognitoClientId = System.getenv("TEST_COGNITO_CLIENT_ID");
