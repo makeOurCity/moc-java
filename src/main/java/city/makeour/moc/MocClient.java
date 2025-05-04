@@ -35,6 +35,24 @@ public class MocClient {
         this.tokenFetcher = new FetchCognitoToken(cognitoUserPoolId, cognitoClientId);
     }
 
+    public void auth(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException {
+        if (this.tokenFetcher == null) {
+            throw new IllegalStateException("MocClient is not initialized with Cognito auth info.");
+        }
+
+        this.tokenFetcher.setAuthParameters(username, password);
+
+        if (this.refreshTokenStorage.hasRefreshToken()) {
+            RefreshTokenInterface refreshToken = this.refreshTokenStorage.getRefreshToken();
+            if (!refreshToken.isExpired()) {
+                this.refreshToken();
+            }
+            return;
+        }
+
+        this.login(username, password);
+    }
+
     public void login(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException {
         if (this.tokenFetcher == null) {
             throw new IllegalStateException("MocClient is not initialized with Cognito auth info.");

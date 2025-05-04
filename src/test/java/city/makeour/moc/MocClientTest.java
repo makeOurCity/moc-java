@@ -84,6 +84,33 @@ class MocClientTest {
         entity.setId("urn:ngsi-ld:TestEntity:" + uuid);
 
         client.entities().createEntity("application/json", entity, "keyValues");
+    }
 
+    @Test
+    @DisplayName("トークンリフレッシュなど行えるかのテスト")
+    @EnabledIfEnvironmentVariables({
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USER_POOL_ID", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_CLIENT_ID", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USERNAME", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_PASSWORD", matches = ".*")
+    })
+    void testAuth() throws GeneralSecurityException, NoSuchAlgorithmException {
+        String cognitoUserPoolId = System.getenv("TEST_COGNITO_USER_POOL_ID");
+        String cognitoClientId = System.getenv("TEST_COGNITO_CLIENT_ID");
+        String username = System.getenv("TEST_COGNITO_USERNAME");
+        String password = System.getenv("TEST_COGNITO_PASSWORD");
+
+        MocClient client = new MocClient();
+        client.setMocAuthInfo(cognitoUserPoolId, cognitoClientId);
+        client.auth(username, password);
+        client.auth(username, password); // トークンリフレッシュを行う
+
+        String uuid = UUID.randomUUID().toString();
+
+        CreateEntityRequest entity = new CreateEntityRequest();
+        entity.setType("TestEntity");
+        entity.setId("urn:ngsi-ld:TestEntity:" + uuid);
+
+        client.entities().createEntity("application/json", entity, "keyValues");
     }
 }
