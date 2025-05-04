@@ -25,5 +25,5 @@ Set `.vscode/settings` env
 
 ```console
 $ mvn clean install
-$ mvn teset
+$ mvn test
 ```
