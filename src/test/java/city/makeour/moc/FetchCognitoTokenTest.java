@@ -5,11 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariables;
+import org.springframework.context.annotation.Description;
 
 class FetchCognitoTokenTest {
 
-    // TODO: テストのスキップについてきちんと動作確認をする。
     @Test
+    @Description("Cognitoのトークンを取得するテスト")
     @EnabledIfEnvironmentVariables({
             @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USER_POOL_ID", matches = ".*"),
             @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_CLIENT_ID", matches = ".*"),
