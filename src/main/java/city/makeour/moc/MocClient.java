@@ -44,7 +44,7 @@ public class MocClient {
         Token token = this.tokenFetcher.fetchTokenWithSrpAuth();
 
         this.setToken(token.getIdToken());
-        this.refreshTokenStorage.setRefreshToken(token.getRefreshToken());
+        this.refreshTokenStorage.setRefreshToken(token);
     }
 
     public void refreshToken() throws InvalidKeyException, NoSuchAlgorithmException {
@@ -52,13 +52,13 @@ public class MocClient {
             throw new IllegalStateException("MocClient is not initialized with Cognito auth info.");
         }
 
-        if (this.refreshTokenStorage.hasRefreshToken()) {
-            String refreshToken = this.refreshTokenStorage.getRefreshToken();
-            Token token = this.tokenFetcher.refleshToken(refreshToken);
-            this.setToken(token.getIdToken());
-        } else {
+        if (!this.refreshTokenStorage.hasRefreshToken()) {
             throw new IllegalStateException("No refresh token available.");
         }
+
+        RefreshTokenInterface refreshToken = this.refreshTokenStorage.getRefreshToken();
+        Token token = this.tokenFetcher.refleshToken(refreshToken.getRefreshToken());
+        this.setToken(token.getIdToken());
     }
 
     public void setToken(String token) {

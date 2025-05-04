@@ -2,7 +2,7 @@ package city.makeour.moc;
 
 import java.time.ZonedDateTime;
 
-public class Token {
+public class Token implements RefreshTokenInterface {
     private String idToken;
     private String refreshToken;
     private String accessToken;

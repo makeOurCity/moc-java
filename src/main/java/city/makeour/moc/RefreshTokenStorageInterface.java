@@ -2,9 +2,9 @@ package city.makeour.moc;
 
 public interface RefreshTokenStorageInterface {
 
-    public String getRefreshToken();
+    public RefreshTokenInterface getRefreshToken();
 
-    public void setRefreshToken(String refreshToken);
+    public void setRefreshToken(RefreshTokenInterface refreshToken);
 
     public boolean hasRefreshToken();
 }
