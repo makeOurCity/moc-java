@@ -21,4 +21,16 @@ jobs:
           cache: maven
 
       - name: Run tests with Maven
-        run: mvn -B test --file pom.xml
+        env:
+          TEST_COGNITO_USER_POOL_ID: ${{ secrets.TEST_COGNITO_USER_POOL_ID }}
+          TEST_COGNITO_CLIENT_ID: ${{ secrets.TEST_COGNITO_CLIENT_ID }}
+          TEST_COGNITO_USERNAME: ${{ secrets.TEST_COGNITO_USERNAME }}
+          TEST_COGNITO_PASSWORD: ${{ secrets.TEST_COGNITO_PASSWORD }}
+        run: >
+          mvn -B test --file pom.xml
+
+      - name: Generate test report
+        run: >
+          mvn -B
+          site -DgenerateReports=false
+          surefire-report:report-only
