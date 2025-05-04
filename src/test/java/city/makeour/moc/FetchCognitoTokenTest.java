@@ -1,6 +1,7 @@
 package city.makeour.moc;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -28,5 +29,13 @@ class FetchCognitoTokenTest {
         Token token = fetchCognitoToken.fetchTokenWithSrpAuth();
         assertNotNull(token.getIdToken());
         assertNotNull(token.getRefreshToken());
+
+        // Refresh tokenを使ってトークンを更新する トークンのローテーションはしない
+        Token refreshedToken = fetchCognitoToken.refleshToken(token.getRefreshToken());
+        assertNotNull(refreshedToken.getIdToken());
+        assertNull(refreshedToken.getRefreshToken());
+
+        Token refreshedToken2 = fetchCognitoToken.refleshToken(token.getRefreshToken());
+        assertNotNull(refreshedToken2.getIdToken());
     }
 }

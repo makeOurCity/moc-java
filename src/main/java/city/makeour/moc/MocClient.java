@@ -35,15 +35,48 @@ public class MocClient {
         this.tokenFetcher = new FetchCognitoToken(cognitoUserPoolId, cognitoClientId);
     }
 
+    public void auth(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException {
+        if (this.tokenFetcher == null) {
+            throw new IllegalStateException("MocClient is not initialized with Cognito auth info.");
+        }
+
+        this.tokenFetcher.setAuthParameters(username, password);
+
+        if (this.refreshTokenStorage.hasRefreshToken()) {
+            RefreshTokenInterface refreshToken = this.refreshTokenStorage.getRefreshToken();
+            if (!refreshToken.isExpired()) {
+                this.refreshToken();
+            }
+            return;
+        }
+
+        this.login(username, password);
+    }
+
     public void login(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException {
         if (this.tokenFetcher == null) {
             throw new IllegalStateException("MocClient is not initialized with Cognito auth info.");
         }
 
         this.tokenFetcher.setAuthParameters(username, password);
-        Token token = this.tokenFetcher.fetchToken();
+        Token token = this.tokenFetcher.fetchTokenWithSrpAuth();
+
         this.setToken(token.getIdToken());
-        this.refreshTokenStorage.setRefreshToken(token.getRefreshToken());
+        this.refreshTokenStorage.setRefreshToken(token);
+    }
+
+    public void refreshToken() throws InvalidKeyException, NoSuchAlgorithmException {
+        if (this.tokenFetcher == null) {
+            throw new IllegalStateException("MocClient is not initialized with Cognito auth info.");
+        }
+
+        if (!this.refreshTokenStorage.hasRefreshToken()) {
+            throw new IllegalStateException("No refresh token available.");
+        }
+
+        RefreshTokenInterface refreshToken = this.refreshTokenStorage.getRefreshToken();
+        Token token = this.tokenFetcher.refleshToken(refreshToken.getRefreshToken());
+        this.setToken(token.getIdToken());
     }
 
     public void setToken(String token) {

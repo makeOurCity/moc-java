@@ -50,6 +50,25 @@ public class FetchCognitoToken implements TokenFetcherInterface {
         this.password = password;
     }
 
+    public Token refleshToken(String refreshToken) {
+        InitiateAuthRequest initiateAuthRequest = InitiateAuthRequest.builder()
+                .authFlow(AuthFlowType.REFRESH_TOKEN_AUTH)
+                .clientId(this.cognitoClientId)
+                .authParameters(Map.of(
+                        "REFRESH_TOKEN", refreshToken))
+                .build();
+        InitiateAuthResponse initiateAuthResponse = cognitoClient.initiateAuth(initiateAuthRequest);
+        AuthenticationResultType result = initiateAuthResponse.authenticationResult();
+
+        Token token = new Token(
+                result.idToken(),
+                result.refreshToken(),
+                result.accessToken(),
+                result.expiresIn());
+
+        return token;
+    }
+
     public Token fetchTokenWithSrpAuth() throws InvalidKeyException, NoSuchAlgorithmException {
         InitiateAuthRequest initiateAuthRequest = InitiateAuthRequest.builder()
                 .authFlow(AuthFlowType.USER_SRP_AUTH)
@@ -87,10 +106,8 @@ public class FetchCognitoToken implements TokenFetcherInterface {
         RespondToAuthChallengeResponse authChallengeResponse = cognitoClient.respondToAuthChallenge(respondRequest);
         AuthenticationResultType authResult = authChallengeResponse.authenticationResult();
 
-        return new Token(authResult.idToken(), authResult.refreshToken());
-    }
+        Integer expiresIn = authResult.expiresIn();
 
-    public Token fetchToken() throws InvalidKeyException, NoSuchAlgorithmException {
-        return this.fetchTokenWithSrpAuth();
+        return new Token(authResult.idToken(), authResult.refreshToken(), authResult.accessToken(), expiresIn);
     }
 }

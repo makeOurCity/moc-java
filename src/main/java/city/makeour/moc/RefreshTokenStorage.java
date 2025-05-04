@@ -2,17 +2,17 @@ package city.makeour.moc;
 
 public class RefreshTokenStorage implements RefreshTokenStorageInterface {
 
-    private String refreshToken;
+    private RefreshTokenInterface refreshToken;
 
     public RefreshTokenStorage() {
         this.refreshToken = null;
     }
 
-    public String getRefreshToken() {
-        return refreshToken;
+    public RefreshTokenInterface getRefreshToken() {
+        return this.refreshToken;
     }
 
-    public void setRefreshToken(String refreshToken) {
+    public void setRefreshToken(RefreshTokenInterface refreshToken) {
         this.refreshToken = refreshToken;
     }
 

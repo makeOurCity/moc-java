@@ -66,6 +66,11 @@
       <artifactId>bcprov-jdk15on</artifactId>
       <version>1.70</version> 
     </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+      <version>5.3.23</version>
+    </dependency>
   </dependencies>
 
   <build>
