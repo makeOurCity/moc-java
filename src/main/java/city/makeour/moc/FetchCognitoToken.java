@@ -63,7 +63,8 @@ public class FetchCognitoToken implements TokenFetcherInterface {
         Token token = new Token(
                 result.idToken(),
                 result.refreshToken(),
-                result.accessToken());
+                result.accessToken(),
+                result.expiresIn());
 
         return token;
     }
@@ -105,6 +106,8 @@ public class FetchCognitoToken implements TokenFetcherInterface {
         RespondToAuthChallengeResponse authChallengeResponse = cognitoClient.respondToAuthChallenge(respondRequest);
         AuthenticationResultType authResult = authChallengeResponse.authenticationResult();
 
-        return new Token(authResult.idToken(), authResult.refreshToken(), authResult.accessToken());
+        Integer expiresIn = authResult.expiresIn();
+
+        return new Token(authResult.idToken(), authResult.refreshToken(), authResult.accessToken(), expiresIn);
     }
 }
