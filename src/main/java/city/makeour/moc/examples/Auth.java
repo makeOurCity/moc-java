@@ -29,7 +29,7 @@ public class Auth {
         entity.setType("TestEntity");
         entity.setId("urn:ngsi-ld:TestEntity:" + uuid);
         try {
-            mocClient.entities().createEntity("application/json", entity, "keyValues");
+            mocClient.createEntity("application/json", entity);
         } catch (RestClientResponseException e) {
             System.err.println("Error creating entity: " + e.getMessage());
         }
