@@ -1,18 +1,18 @@
 # MoC Java
+
 MoC client for Java
 
 [![Java CI with Maven](https://github.com/makeOurCity/moc-java/actions/workflows/test.yml/badge.svg)](https://github.com/makeOurCity/moc-java/actions/workflows/test.yml)
 
-
-# Usage
+## Usage
 
 See [city.makeour.moc.examples](./src/main/java/city/makeour/moc/examples/)
 
-# Development
+## Development
 
-## Testing
+### Testing
 
-Set `.vscode/settings` env
+Set `xxxx.code-workspace` env and use it.
 
 ```json
 {
@@ -28,6 +28,6 @@ Set `.vscode/settings` env
 ```
 
 ```console
-$ mvn clean install
-$ mvn test
+mvn clean install
+mvn test
 ```

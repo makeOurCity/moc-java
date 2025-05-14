@@ -23,7 +23,7 @@ class MocClientTest {
     @DisplayName("デフォルトコンストラクタで正しいベースパスが設定されることを確認")
     void defaultConstructorShouldSetCorrectBasePath() {
         MocClient client = new MocClient();
-        assertEquals("https://orion.sandbox.makeour.city", client.apiClient.getBasePath());
+        assertEquals("https://orion.sandbox.makeour.city", client.client.getApiClient().getBasePath());
     }
 
     @Test
@@ -31,7 +31,7 @@ class MocClientTest {
     void constructorWithBasePathShouldSetCustomBasePath() {
         String customBasePath = "https://custom.orion.example.com";
         MocClient client = new MocClient(customBasePath);
-        assertEquals(customBasePath, client.apiClient.getBasePath());
+        assertEquals(customBasePath, client.client.getApiClient().getBasePath());
     }
 
     @Test
@@ -41,7 +41,7 @@ class MocClientTest {
         EntitiesApi entitiesApi = client.entities();
 
         assertNotNull(entitiesApi);
-        assertEquals(client.entitiesApi, entitiesApi);
+        assertEquals(client.client.getEntitiesApi(), entitiesApi);
     }
 
     @Test

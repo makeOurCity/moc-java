@@ -3,13 +3,12 @@ package city.makeour.moc;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+import city.makeour.moc.ngsiv2.Ngsiv2Client;
 import city.makeour.ngsi.v2.api.EntitiesApi;
 import city.makeour.ngsi.v2.invoker.ApiClient;
 
 public class MocClient {
-    protected ApiClient apiClient;
-
-    protected EntitiesApi entitiesApi;
+    protected Ngsiv2Client client;
 
     protected TokenFetcherInterface tokenFetcher;
 
@@ -20,15 +19,16 @@ public class MocClient {
     }
 
     public MocClient(String basePath) {
-        this.apiClient = new ApiClient();
-        this.apiClient.setBasePath(basePath);
+        ApiClient apiClient = new ApiClient();
+        apiClient.setBasePath(basePath);
 
-        this.entitiesApi = new EntitiesApi(this.apiClient);
+        this.client = new Ngsiv2Client(apiClient);
+
         this.refreshTokenStorage = new RefreshTokenStorage();
     }
 
     public EntitiesApi entities() {
-        return this.entitiesApi;
+        return this.client.getEntitiesApi();
     }
 
     public void setMocAuthInfo(String cognitoUserPoolId, String cognitoClientId) {
@@ -80,6 +80,14 @@ public class MocClient {
     }
 
     public void setToken(String token) {
-        this.apiClient.addDefaultHeader("Authorization", token);
+        this.client.getApiClient().addDefaultHeader("Authorization", token);
+    }
+
+    public void setFiwareService(String fiwareService) {
+        this.client.getApiClient().addDefaultHeader("Fiware-Service", fiwareService);
+    }
+
+    public void createEntity(String contentType, Object body) {
+        this.client.createEntity(contentType, body);
     }
 }
