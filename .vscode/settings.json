@@ -16,6 +16,7 @@
     "cognitoidentityprovider",
     "Dfile",
     "fiware",
+    "jenv",
     "jitpack",
     "libexec",
     "makeour",

@@ -17,7 +17,7 @@ Set `xxxx.code-workspace` env and use it.
 ```json
 {
   "settings": {
-    "java.jdt.ls.java.home": "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home",
+    "java.jdt.ls.java.home": "/Users/xxxx/.jenv/versions/17",
     "java.test.config": {
       "env": {
         "TEST_COGNITO_USER_POOL_ID": "",
