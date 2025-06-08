@@ -2,6 +2,6 @@
   "recommendations": [
     "streetsidesoftware.code-spell-checker",
     "davidanson.vscode-markdownlint",
-    "vscjava.vscode-java-pack"
+    "vscjava.vscode-java-pack",
   ]
 }

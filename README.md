@@ -16,12 +16,15 @@ Set `xxxx.code-workspace` env and use it.
 
 ```json
 {
-  "java.test.config": {
-    "env": {
-      "TEST_COGNITO_USER_POOL_ID": "",
-      "TEST_COGNITO_CLIENT_ID": "",
-      "TEST_COGNITO_USERNAME": "",
-      "TEST_COGNITO_PASSWORD": ""
+  "settings": {
+    "java.jdt.ls.java.home": "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home",
+    "java.test.config": {
+      "env": {
+        "TEST_COGNITO_USER_POOL_ID": "",
+        "TEST_COGNITO_CLIENT_ID": "",
+        "TEST_COGNITO_USERNAME": "",
+        "TEST_COGNITO_PASSWORD": ""
+      }
     }
   }
 }
