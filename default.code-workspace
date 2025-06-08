@@ -7,7 +7,7 @@
   "settings": {
     "files.autoGuessEncoding": true,
     "files.encoding": "utf8",
-    "java.jdt.ls.java.home": "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home",
+    "java.jdt.ls.java.home": "/Users/xxxx/.jenv/versions/17",
     "java.jdt.ls.vmargs": "-Dfile.encoding=UTF-8",
     "java.configuration.updateBuildConfiguration": "interactive",
     "java.test.config": {
