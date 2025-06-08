@@ -15,6 +15,7 @@
     "bouncycastle",
     "cognitoidentityprovider",
     "Dfile",
+    "Dgenerate",
     "fiware",
     "jenv",
     "jitpack",

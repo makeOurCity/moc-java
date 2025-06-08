@@ -27,10 +27,10 @@ jobs:
           TEST_COGNITO_USERNAME: ${{ secrets.TEST_COGNITO_USERNAME }}
           TEST_COGNITO_PASSWORD: ${{ secrets.TEST_COGNITO_PASSWORD }}
         run: >
-          mvn -B test --file pom.xml
+          mvn -B -Dfile.encoding=UTF-8 test --file pom.xml
 
       - name: Generate test report
         run: >
-          mvn -B
+          mvn -B -Dfile.encoding=UTF-8
           site -DgenerateReports=false
           surefire-report:report-only
