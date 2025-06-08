@@ -10,13 +10,20 @@
   "javac-linter.javac": "javac -Dfile.encoding=UTF-8",
   "java.configuration.updateBuildConfiguration": "interactive",
   "cSpell.words": [
+    "awssdk",
+    "bcprov",
+    "bouncycastle",
+    "cognitoidentityprovider",
     "Dfile",
     "fiware",
+    "jitpack",
     "libexec",
     "makeour",
     "ngsi",
     "Ngsiv",
-    "vmargs"
+    "springframework",
+    "vmargs",
+    "webmvc"
   ],
   "java.compile.nullAnalysis.mode": "automatic"
 }
