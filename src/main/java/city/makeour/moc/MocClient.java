@@ -3,6 +3,8 @@ package city.makeour.moc;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+import org.springframework.web.client.RestClient.ResponseSpec;
+
 import city.makeour.moc.ngsiv2.Ngsiv2Client;
 import city.makeour.ngsi.v2.api.EntitiesApi;
 import city.makeour.ngsi.v2.invoker.ApiClient;
@@ -87,7 +89,7 @@ public class MocClient {
         this.client.getApiClient().addDefaultHeader("Fiware-Service", fiwareService);
     }
 
-    public void createEntity(String contentType, Object body) {
-        this.client.createEntity(contentType, body);
+    public ResponseSpec createEntity(String contentType, Object body) {
+        return this.client.createEntity(contentType, body);
     }
 }
