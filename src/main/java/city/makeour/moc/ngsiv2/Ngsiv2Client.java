@@ -37,6 +37,26 @@ public class Ngsiv2Client {
         return entitiesApi;
     }
 
+    public RestClient.ResponseSpec batchOperations() {
+        Map<String, Object> pathParams = new HashMap<>();
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        HttpHeaders headerParams = new HttpHeaders();
+        MultiValueMap<String, String> cookieParams = new LinkedMultiValueMap<>();
+        MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<>();
+        queryParams.putAll(this.apiClient.parameterToMultiValueMap((ApiClient.CollectionFormat) null, "options", "keyValues"));
+
+        String[] localVarAccepts = new String[0];
+        List<MediaType> localVarAccept = this.apiClient.selectHeaderAccept(localVarAccepts);
+        String[] localVarContentTypes = new String[0];
+        MediaType localVarContentType = this.apiClient.selectHeaderContentType(localVarContentTypes);
+        String[] localVarAuthNames = new String[0];
+        ParameterizedTypeReference<Void> localVarReturnType = new ParameterizedTypeReference<>() {
+        };
+        return this.apiClient.invokeAPI("/v2/operations/batch", HttpMethod.POST, pathParams, queryParams, null,
+                headerParams, cookieParams, formParams, localVarAccept, localVarContentType, localVarAuthNames,
+                localVarReturnType);
+    }
+
     public RestClient.ResponseSpec createEntity(String contentType, Object body) {
         if (contentType == null) {
             throw new RestClientResponseException(
