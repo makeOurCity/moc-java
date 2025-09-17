@@ -92,4 +92,9 @@ public class MocClient {
     public ResponseSpec createEntity(String contentType, Object body) {
         return this.client.createEntity(contentType, body);
     }
+
+    public ResponseSpec getEntity(String entityId, String type, String attrs, String metadata, String options) {
+        return this.entities().retrieveEntityWithResponseSpec(entityId, type, attrs, metadata, options);
+    }
+
 }
