@@ -139,8 +139,9 @@ class MocClientTest {
         client.entities().createEntity("application/json", entity, null);
 
         // getEntityの呼び出し、レスポンスの変換
-        RetrieveEntityResponse retrievedEntity = client.getEntity(entityId)
-                                .body(RetrieveEntityResponse.class);
+        RetrieveEntityResponse retrievedEntity = client
+                .getEntity(entityId, "TestEntity", null, null, null)
+                .body(RetrieveEntityResponse.class);
 
         assertNotNull(retrievedEntity);
         assertEquals(entityId, retrievedEntity.getId());
