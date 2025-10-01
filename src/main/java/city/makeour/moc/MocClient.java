@@ -97,4 +97,16 @@ public class MocClient {
         return this.entities().retrieveEntityWithResponseSpec(entityId, type, attrs, metadata, options);
     }
 
+    public ResponseSpec getEntity(String entityId, String type, String attrs, String metadata) {
+        return this.getEntity(entityId, type, attrs, metadata, "keyValues");
+    }
+
+    public ResponseSpec getEntity(String entityId, String type, String attrs) {
+        return this.getEntity(entityId, type, attrs, "abc", "keyValues");
+    }
+
+    public ResponseSpec getEntity(String entityId, String type) {
+        return this.getEntity(entityId, type, null, null, "keyValues");
+    }
+
 }
