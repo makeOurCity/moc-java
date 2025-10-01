@@ -136,7 +136,7 @@ class MocClientTest {
         entity.setId(entityId);
 
         // 作成を実行
-        client.entities().createEntity("application/json", entity, null);
+        client.entities().createEntity("application/json", entity, "keyValues");
 
         // getEntityの呼び出し、レスポンスの変換
         RetrieveEntityResponse retrievedEntity = client
