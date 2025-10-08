@@ -145,5 +145,5 @@ class MocClientTest {
 
         assertNotNull(retrievedEntity);
         assertEquals(entityId, retrievedEntity.getId());
-    }    
+    }
 }
