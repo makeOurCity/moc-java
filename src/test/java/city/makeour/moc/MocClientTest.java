@@ -16,6 +16,7 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariables;
 import city.makeour.ngsi.v2.api.EntitiesApi;
 import city.makeour.ngsi.v2.model.CreateEntityRequest;
 import city.makeour.ngsi.v2.model.ListEntitiesResponse;
+import city.makeour.ngsi.v2.model.RetrieveEntityResponse;
 
 class MocClientTest {
 
@@ -94,6 +95,7 @@ class MocClientTest {
             @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USERNAME", matches = ".*"),
             @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_PASSWORD", matches = ".*")
     })
+
     void testAuth() throws GeneralSecurityException, NoSuchAlgorithmException {
         String cognitoUserPoolId = System.getenv("TEST_COGNITO_USER_POOL_ID");
         String cognitoClientId = System.getenv("TEST_COGNITO_CLIENT_ID");
@@ -112,5 +114,36 @@ class MocClientTest {
         entity.setId("urn:ngsi-ld:TestEntity:" + uuid);
 
         client.entities().createEntity("application/json", entity, "keyValues");
+    }
+
+    @Test
+    @DisplayName("エンティティを作成・取得できるかのテスト（最小版）")
+    @EnabledIfEnvironmentVariables({
+        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USER_POOL_ID", matches = ".*"),
+        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_CLIENT_ID", matches = ".*"),
+        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USERNAME", matches = ".*"),
+        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_PASSWORD", matches = ".*")
+    })
+    void testCreateAndGetEntity_Minimal() throws GeneralSecurityException, NoSuchAlgorithmException {
+        MocClient client = new MocClient();
+        client.setMocAuthInfo(System.getenv("TEST_COGNITO_USER_POOL_ID"), System.getenv("TEST_COGNITO_CLIENT_ID"));
+        client.login(System.getenv("TEST_COGNITO_USERNAME"), System.getenv("TEST_COGNITO_PASSWORD"));
+
+        // 作成&取得
+        String entityId = "urn:ngsi-ld:TestEntity:" + UUID.randomUUID().toString();
+        CreateEntityRequest entity = new CreateEntityRequest();
+        entity.setType("TestEntity");
+        entity.setId(entityId);
+
+        // 作成を実行
+        client.entities().createEntity("application/json", entity, "keyValues");
+
+        // getEntityの呼び出し、レスポンスの変換
+        RetrieveEntityResponse retrievedEntity = client
+                .getEntity(entityId, "TestEntity", null, null, null)
+                .body(RetrieveEntityResponse.class);
+
+        assertNotNull(retrievedEntity);
+        assertEquals(entityId, retrievedEntity.getId());
     }
 }
