@@ -93,14 +93,55 @@ public class MocClient {
         return this.client.createEntity(contentType, body);
     }
 
+    /**
+     * Retrieves an entity with the specified parameters.
+     *
+     * @param entityId The ID of the entity to retrieve.
+     * @param type The type of the entity.
+     * @param attrs Comma-separated list of attribute names to include in the response. If null, all attributes are returned.
+     * @param metadata Comma-separated list of metadata names to include. If null, all metadata is returned.
+     * @param options Options to modify the response format (e.g., "keyValues" for simplified representation).
+     * @return The response specification for the entity retrieval request.
+     * 
+     * <p>
+     * Use this overload to fully customize the entity retrieval, including which attributes,
+     * metadata, and options are used. The {@code options} parameter allows you to control
+     * the response format; for example, "keyValues" returns a simplified JSON object.
+     * </p>
+     */
     public ResponseSpec getEntity(String entityId, String type, String attrs, String metadata, String options) {
         return this.entities().retrieveEntityWithResponseSpec(entityId, type, attrs, metadata, "keyValues");
     }
 
+    /**
+     * Retrieves an entity with the specified ID, type, and attributes.
+     *
+     * @param entityId The ID of the entity to retrieve.
+     * @param type The type of the entity.
+     * @param attrs Comma-separated list of attribute names to include in the response. If null, all attributes are returned.
+     * @return The response specification for the entity retrieval request.
+     *
+     * <p>
+     * This overload defaults {@code metadata} to {@code null} (all metadata) and {@code options} to {@code "keyValues"}
+     * for a simplified response format.
+     * </p>
+     */
     public ResponseSpec getEntity(String entityId, String type, String attrs) {
         return this.entities().retrieveEntityWithResponseSpec(entityId, type, attrs, null, "keyValues");
     }
 
+    /**
+     * Retrieves an entity with the specified ID and type.
+     *
+     * @param entityId The ID of the entity to retrieve.
+     * @param type The type of the entity.
+     * @return The response specification for the entity retrieval request.
+     *
+     * <p>
+     * This overload defaults {@code attrs} and {@code metadata} to {@code null} (all attributes and metadata),
+     * and {@code options} to {@code "keyValues"} for a simplified response format.
+     * </p>
+     */
     public ResponseSpec getEntity(String entityId, String type) {
         return this.entities().retrieveEntityWithResponseSpec(entityId, type, null, null, "keyValues");
     }
