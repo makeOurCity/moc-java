@@ -2,12 +2,15 @@ package city.makeour.moc;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec;
 
 import city.makeour.moc.ngsiv2.Ngsiv2Client;
 import city.makeour.ngsi.v2.api.EntitiesApi;
 import city.makeour.ngsi.v2.invoker.ApiClient;
+import city.makeour.ngsi.v2.model.UpdateExistingEntityAttributesRequest;
 
 public class MocClient {
     protected Ngsiv2Client client;
@@ -103,6 +106,54 @@ public class MocClient {
 
     public ResponseSpec getEntity(String entityId, String type) {
         return this.entities().retrieveEntityWithResponseSpec(entityId, type, null, null, "keyValues");
+    }
+
+    public ResponseSpec updateEntity(String id, String type, Map<String, Object> attributesToUpdate) {
+        if (id == null || id.isBlank()) throw new IllegalArgumentException("id is required");
+        if (type == null || type.isBlank()) throw new IllegalArgumentException("type is required");
+        if (attributesToUpdate == null) attributesToUpdate = java.util.Collections.emptyMap();
+    
+        try {
+            // Existence check
+            this.entities()
+                .retrieveEntityWithResponseSpec(id, type, null, null, "keyValues")
+                .toEntity(String.class);
+    
+            // Exists -> PATCH
+            
+            // 1. Create the UpdateExistingEntityAttributesRequest object
+            UpdateExistingEntityAttributesRequest requestBody = new UpdateExistingEntityAttributesRequest();
+            
+            // 2. Populate the request body by manually checking keys
+            //    (This is necessary because the Request class is not generic)
+            if (attributesToUpdate.containsKey("temperature")) {
+                requestBody.setTemperature(attributesToUpdate.get("temperature"));
+            }
+            if (attributesToUpdate.containsKey("seatNumber")) {
+                requestBody.setSeatNumber(attributesToUpdate.get("seatNumber"));
+            }
+            // Note: Any other keys in attributesToUpdate will be ignored.
+
+            // 3. Pass all arguments correctly
+            return this.entities()
+                .updateExistingEntityAttributesWithResponseSpec(
+                    id,                         // entityId
+                    "application/json",         // contentType
+                    requestBody,                // body
+                    type,                       // type
+                    "keyValues"                 // options
+                );
+    
+        } catch (org.springframework.web.client.RestClientResponseException e) {
+            if (e.getRawStatusCode() != 404) throw e;
+    
+            // Not found -> create (This part is OK as-is)
+            java.util.Map<String, Object> body = new java.util.HashMap<>();
+            body.put("id", id);
+            body.put("type", type);
+            body.putAll(attributesToUpdate); // Use the new variable name here
+            return this.createEntity("application/json", body);
+        }
     }
 
 }
