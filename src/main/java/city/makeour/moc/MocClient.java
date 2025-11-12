@@ -118,42 +118,26 @@ public class MocClient {
             this.entities()
                 .retrieveEntityWithResponseSpec(id, type, null, null, "keyValues")
                 .toEntity(String.class);
-    
-            // Exists -> PATCH
-            
-            // 1. Create the UpdateExistingEntityAttributesRequest object
-            UpdateExistingEntityAttributesRequest requestBody = new UpdateExistingEntityAttributesRequest();
-            
-            // 2. Populate the request body by manually checking keys
-            //    (This is necessary because the Request class is not generic)
-            if (attributesToUpdate.containsKey("temperature")) {
-                requestBody.setTemperature(attributesToUpdate.get("temperature"));
-            }
-            if (attributesToUpdate.containsKey("seatNumber")) {
-                requestBody.setSeatNumber(attributesToUpdate.get("seatNumber"));
-            }
-            // Note: Any other keys in attributesToUpdate will be ignored.
 
-            // 3. Pass all arguments correctly
-            return this.entities()
-                .updateExistingEntityAttributesWithResponseSpec(
-                    id,                         // entityId
-                    "application/json",         // contentType
-                    requestBody,                // body
-                    type,                       // type
-                    "keyValues"                 // options
-                );
-    
+            // Exists -> PATCH (keyValues 形式でそのまま送る)
+            return this.client.updateEntityAttributes(
+                id,
+                "application/json",
+                attributesToUpdate, // Object(Map) をそのまま PATCH
+                type,
+                "keyValues"
+            );
+            
         } catch (org.springframework.web.client.RestClientResponseException e) {
-            if (e.getRawStatusCode() != 404) throw e;
-    
-            // Not found -> create (This part is OK as-is)
+            if (e.getStatusCode().value() != 404) throw e;
+
+            // Not found -> create (従来通り)
             java.util.Map<String, Object> body = new java.util.HashMap<>();
             body.put("id", id);
             body.put("type", type);
-            body.putAll(attributesToUpdate); // Use the new variable name here
+            body.putAll(attributesToUpdate);
             return this.createEntity("application/json", body);
-        }
+        }   
     }
 
 }

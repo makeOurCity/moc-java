@@ -71,4 +71,71 @@ public class Ngsiv2Client {
                     localVarReturnType);
         }
     }
+
+    public RestClient.ResponseSpec updateEntityAttributes(
+        String entityId,
+        String contentType,
+        Object body,
+        String type,
+        String options
+    ) {
+        if (entityId == null) {
+            throw new RestClientResponseException(
+                "Missing the required parameter 'entityId' when calling updateEntityAttributes",
+                HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                (HttpHeaders) null, (byte[]) null, (Charset) null
+            );
+        }
+        if (contentType == null) {
+            throw new RestClientResponseException(
+                "Missing the required parameter 'contentType' when calling updateEntityAttributes",
+                HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                (HttpHeaders) null, (byte[]) null, (Charset) null
+            );
+        }
+        if (body == null) {
+            throw new RestClientResponseException(
+                "Missing the required parameter 'body' when calling updateEntityAttributes",
+                HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                (HttpHeaders) null, (byte[]) null, (Charset) null
+            );
+        }
+
+        Map<String, Object> pathParams = new HashMap();
+        pathParams.put("entityId", entityId);
+
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap();
+        HttpHeaders headerParams = new HttpHeaders();
+        MultiValueMap<String, String> cookieParams = new LinkedMultiValueMap();
+        MultiValueMap<String, Object> formParams = new LinkedMultiValueMap();
+
+        // ?type=... と ?options=...
+        queryParams.putAll(this.apiClient.parameterToMultiValueMap(null, "type", type));
+        queryParams.putAll(this.apiClient.parameterToMultiValueMap(null, "options", options));
+
+        headerParams.add("Content-Type", this.apiClient.parameterToString(contentType));
+
+        String[] localVarAccepts = new String[] { }; // 204 No Content 想定
+        List<MediaType> localVarAccept = this.apiClient.selectHeaderAccept(localVarAccepts);
+        String[] localVarContentTypes = new String[] { "application/json" };
+        MediaType localVarContentType = this.apiClient.selectHeaderContentType(localVarContentTypes);
+        String[] localVarAuthNames = new String[] { };
+
+        ParameterizedTypeReference<Void> localVarReturnType = new ParameterizedTypeReference<>() {};
+        return this.apiClient.invokeAPI(
+            "/v2/entities/{entityId}/attrs",
+            HttpMethod.PATCH,
+            pathParams,
+            queryParams,
+            body,  // ← Map<String,Object> 等をそのまま渡す
+            headerParams,
+            cookieParams,
+            formParams,
+            localVarAccept,
+            localVarContentType,
+            localVarAuthNames,
+            localVarReturnType
+        );
+    }
+
 }
