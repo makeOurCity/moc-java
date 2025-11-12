@@ -119,7 +119,7 @@ public class MocClient {
                 .retrieveEntityWithResponseSpec(id, type, null, null, "keyValues")
                 .toEntity(String.class);
 
-            // Exists -> PATCH (keyValues 形式でそのまま送る)
+            // Exists -> POST (keyValues 形式でそのまま送る)
             return this.client.updateEntityAttributes(
                 id,
                 "application/json",
@@ -127,7 +127,7 @@ public class MocClient {
                 type,
                 "keyValues"
             );
-            
+
         } catch (org.springframework.web.client.RestClientResponseException e) {
             if (e.getStatusCode().value() != 404) throw e;
 

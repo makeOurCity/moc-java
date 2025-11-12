@@ -124,7 +124,7 @@ public class Ngsiv2Client {
         ParameterizedTypeReference<Void> localVarReturnType = new ParameterizedTypeReference<>() {};
         return this.apiClient.invokeAPI(
             "/v2/entities/{entityId}/attrs",
-            HttpMethod.PATCH,
+            HttpMethod.POST,
             pathParams,
             queryParams,
             body,  // ← Map<String,Object> 等をそのまま渡す
