@@ -205,6 +205,4 @@ class MocClientTest {
         // PATCH処理で無視されたため存在しない
         assertFalse(updatedEntity.containsKey("status"));
     }
-
-
 }
