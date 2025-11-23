@@ -36,6 +36,12 @@ public class Helper {
     }
 
     public static byte[] hexStringToByteArray(String s) {
+
+        // 奇数桁なら先頭に 0 を追加
+        if (s.length() % 2 != 0) {
+            s = "0" + s;
+        }
+
         int len = s.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
