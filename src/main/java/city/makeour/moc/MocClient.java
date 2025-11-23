@@ -158,7 +158,7 @@ public class MocClient {
             // Existence check
             this.entities()
                 .retrieveEntityWithResponseSpec(id, type, null, null, "keyValues")
-                .toEntity(String.class);
+                .toEntity(Object.class);
 
             // Exists -> POST (keyValues 形式でそのまま送る)
             return this.client.updateEntityAttributes(
