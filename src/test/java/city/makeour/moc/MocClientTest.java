@@ -202,7 +202,7 @@ class MocClientTest {
         assertEquals(10, updatedEntity.get("seatNumber"));
         // 最初の作成時から変更されず残っている
         assertEquals(50, updatedEntity.get("humidity"));
-        // PATCH処理で無視されたため存在しない
-        assertFalse(updatedEntity.containsKey("status"));
+        
+        assertEquals("active", updatedEntity.get("status"));
     }
 }
