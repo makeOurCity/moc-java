@@ -3,6 +3,7 @@ package city.makeour.moc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
@@ -16,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariables;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.RestClientResponseException;
 
 import city.makeour.ngsi.v2.api.EntitiesApi;
 import city.makeour.ngsi.v2.model.CreateEntityRequest;
@@ -205,4 +208,52 @@ class MocClientTest {
         
         assertEquals("active", updatedEntity.get("status"));
     }
+
+    @Test
+    @DisplayName("deleteEntityのテスト（ID+Type指定、IDのみ指定の2パターン）")
+    @EnabledIfEnvironmentVariables({
+        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USER_POOL_ID", matches = ".*"),
+        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_CLIENT_ID", matches = ".*"),
+        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USERNAME", matches = ".*"),
+        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_PASSWORD", matches = ".*")
+    })
+    void testDeleteEntity() throws GeneralSecurityException, NoSuchAlgorithmException {
+        // 1. セットアップ
+        MocClient client = new MocClient();
+        client.setMocAuthInfo(System.getenv("TEST_COGNITO_USER_POOL_ID"), System.getenv("TEST_COGNITO_CLIENT_ID"));
+        client.login(System.getenv("TEST_COGNITO_USERNAME"), System.getenv("TEST_COGNITO_PASSWORD"));
+
+        String type = "TestDeleteType";
+
+        // ケース 1: deleteEntity(id, type)
+        String id1 = "urn:ngsi-ld:TestDelete:1:" + UUID.randomUUID().toString();
+        
+        // データ作成（既存のupdateEntityを利用して作成）
+        client.updateEntity(id1, type, Map.of("value", 100));
+
+        // 削除実行（テスト対象）
+        client.deleteEntity(id1, type).toBodilessEntity();
+
+        // 検証: 取得しようとして 404 Not Found になることを確認
+        RestClientResponseException ex1 = assertThrows(RestClientResponseException.class, () -> {
+            client.getEntity(id1, type).toBodilessEntity();
+        });
+        assertEquals(HttpStatus.NOT_FOUND.value(), ex1.getStatusCode().value());
+
+        // ケース 2: deleteEntity(id) - IDのみでの削除
+        String id2 = "urn:ngsi-ld:TestDelete:2:" + UUID.randomUUID().toString();
+
+        // データ作成
+        client.updateEntity(id2, type, Map.of("value", 200));
+
+        // 削除実行（テスト対象）
+        client.deleteEntity(id2).toBodilessEntity();
+
+        // 検証: 取得しようとして 404 Not Found になることを確認
+        RestClientResponseException ex2 = assertThrows(RestClientResponseException.class, () -> {
+            client.getEntity(id2, type).toBodilessEntity();
+        });
+        assertEquals(HttpStatus.NOT_FOUND.value(), ex2.getStatusCode().value());
+    }
+
 }
