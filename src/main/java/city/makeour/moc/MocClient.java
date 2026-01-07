@@ -181,4 +181,22 @@ public class MocClient {
         }   
     }
 
+    // 指定された ID と Type を持つEntityを削除
+    public ResponseSpec deleteEntity(String entityId, String type) {
+        if (entityId == null || entityId.isBlank()) {
+            throw new IllegalArgumentException("id is required");
+        }
+        // EntitiesApi に定義されている removeEntityWithResponseSpec を呼び出す
+        return this.entities().removeEntityWithResponseSpec(entityId, type);
+    }
+
+    // 指定された ID を持つEntityを削除
+    public ResponseSpec deleteEntity(String entityId) {
+        return this.deleteEntity(entityId, null);
+    }
+
+
+
+
+
 }
