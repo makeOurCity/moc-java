@@ -149,35 +149,33 @@ public class MocClient {
         return this.entities().retrieveEntityWithResponseSpec(entityId, type, null, null, "keyValues");
     }
 
-    public ResponseSpec updateEntity(String id, String type, Map<String, Object> attributesToUpdate) {
+    public ResponseSpec updateEntity(String id, String type, Object attributesToUpdate) { // Map から Object に変更
         if (id == null || id.isBlank()) throw new IllegalArgumentException("id is required");
         if (type == null || type.isBlank()) throw new IllegalArgumentException("type is required");
-        if (attributesToUpdate == null) attributesToUpdate = java.util.Collections.emptyMap();
+        if (attributesToUpdate == null) return null;
     
         try {
-            // Existence check
+            // 存在確認
             this.entities()
                 .retrieveEntityWithResponseSpec(id, type, null, null, "keyValues")
                 .toEntity(Object.class);
-
-            // Exists -> POST (keyValues 形式でそのまま送る)
+    
+            // 存在する場合：PATCH で属性更新
+            // attributesToUpdate が Ping オブジェクトでも Jackson が適切に処理します
             return this.client.updateEntityAttributes(
                 id,
                 "application/json",
-                attributesToUpdate, // Object(Map) をそのまま PATCH
+                attributesToUpdate,
                 type,
                 "keyValues"
             );
-
+    
         } catch (org.springframework.web.client.RestClientResponseException e) {
             if (e.getStatusCode().value() != 404) throw e;
-
-            // Not found -> create (従来通り)
-            java.util.Map<String, Object> body = new java.util.HashMap<>();
-            body.put("id", id);
-            body.put("type", type);
-            body.putAll(attributesToUpdate);
-            return this.createEntity("application/json", body);
+    
+            // 存在しない場合：新規作成 (POST)
+            // Ping オブジェクトをそのまま渡せば、内部の id/type フィールドも含めて POST されます
+            return this.createEntity("application/json", attributesToUpdate);
         }   
     }
 
