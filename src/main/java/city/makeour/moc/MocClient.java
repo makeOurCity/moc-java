@@ -7,6 +7,11 @@ import java.util.Map;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import city.makeour.moc.ngsiv2.Ngsiv2Client;
 import city.makeour.ngsi.v2.api.EntitiesApi;
 import city.makeour.ngsi.v2.invoker.ApiClient;
@@ -192,6 +197,15 @@ public class MocClient {
                 return this.createEntity("application/json", attributesToUpdate);
             }
         }   
+    }
+    
+    public ResponseSpec updateEntity(String id, String type, Object o) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        
+        Map<String, Object> m = mapper.convertValue(o, new TypeReference<Map<String, Object>>() {});
+        return updateEntity(id, type, m);
     }
 
 
