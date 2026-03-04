@@ -154,27 +154,21 @@ public class MocClient {
         return this.entities().retrieveEntityWithResponseSpec(entityId, type, null, null, "keyValues");
     }
 
-    // 1. 引数を Map から Object に変更
-    public ResponseSpec updateEntity(String id, String type, Object attributesToUpdate) {
+    // Map版（メインロジック）
+    public ResponseSpec updateEntity(String id, String type, Map<String, Object> attributesToUpdate) {
         if (id == null || id.isBlank()) throw new IllegalArgumentException("id is required");
         if (type == null || type.isBlank()) throw new IllegalArgumentException("type is required");
-        
-        // 2. nullチェックのみ行う（Object型なので emptyMap の代入は不要）
-        if (attributesToUpdate == null) {
-            attributesToUpdate = new java.util.HashMap<String, Object>();
-        }
+        if (attributesToUpdate == null) attributesToUpdate = java.util.Collections.emptyMap();
 
         try {
-            // 存在確認
             this.entities()
                 .retrieveEntityWithResponseSpec(id, type, null, null, "keyValues")
                 .toEntity(Object.class);
 
-            // 3. そのまま送信（client側が Object を受け取れる前提）
             return this.client.updateEntityAttributes(
                 id,
                 "application/json",
-                attributesToUpdate, 
+                attributesToUpdate,
                 type,
                 "keyValues"
             );
@@ -182,23 +176,15 @@ public class MocClient {
         } catch (org.springframework.web.client.RestClientResponseException e) {
             if (e.getStatusCode().value() != 404) throw e;
 
-            // 4. 新規作成時の処理
-            if (attributesToUpdate instanceof java.util.Map) {
-                // Mapの場合の既存ロジック
-                java.util.Map<String, Object> body = new java.util.HashMap<>();
-                body.put("id", id);
-                body.put("type", type);
-                body.putAll((java.util.Map<String, Object>) attributesToUpdate);
-                return this.createEntity("application/json", body);
-            } else {
-                // Pingオブジェクトなどの場合
-                // 本来はオブジェクトに id/type をセットする処理が必要ですが、
-                // 一旦そのまま作成を試みる形にします
-                return this.createEntity("application/json", attributesToUpdate);
-            }
+            java.util.Map<String, Object> body = new java.util.HashMap<>();
+            body.put("id", id);
+            body.put("type", type);
+            body.putAll(attributesToUpdate);
+            return this.createEntity("application/json", body);
         }   
     }
-    
+
+    // Object版（Mapに変換してMap版に委譲）
     public ResponseSpec updateEntity(String id, String type, Object o) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -207,7 +193,6 @@ public class MocClient {
         Map<String, Object> m = mapper.convertValue(o, new TypeReference<Map<String, Object>>() {});
         return updateEntity(id, type, m);
     }
-
 
 
 
