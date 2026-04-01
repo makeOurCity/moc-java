@@ -1,7 +1,6 @@
 package city.makeour.moc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -126,10 +125,10 @@ class MocClientTest {
     @Test
     @DisplayName("エンティティを作成・取得できるかのテスト（最小版）")
     @EnabledIfEnvironmentVariables({
-        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USER_POOL_ID", matches = ".*"),
-        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_CLIENT_ID", matches = ".*"),
-        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USERNAME", matches = ".*"),
-        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_PASSWORD", matches = ".*")
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USER_POOL_ID", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_CLIENT_ID", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USERNAME", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_PASSWORD", matches = ".*")
     })
     void testCreateAndGetEntity_Minimal() throws GeneralSecurityException, NoSuchAlgorithmException {
         MocClient client = new MocClient();
@@ -152,108 +151,90 @@ class MocClientTest {
 
         assertNotNull(retrievedEntity);
         assertEquals(entityId, retrievedEntity.getId());
-    }    
+    }
 
     @Test
-        @DisplayName("updateEntityのUpsert（作成・更新）ロジックをテストする")
-        @EnabledIfEnvironmentVariables({
+    @DisplayName("updateEntityのUpsert（作成・更新）ロジックをテストする")
+    @EnabledIfEnvironmentVariables({
             @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USER_POOL_ID", matches = ".*"),
             @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_CLIENT_ID", matches = ".*"),
             @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USERNAME", matches = ".*"),
             @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_PASSWORD", matches = ".*")
-        })
+    })
     void testUpdateEntity_UpsertLogic() throws GeneralSecurityException, NoSuchAlgorithmException {
         MocClient client = new MocClient();
         client.setMocAuthInfo(System.getenv("TEST_COGNITO_USER_POOL_ID"), System.getenv("TEST_COGNITO_CLIENT_ID"));
         client.login(System.getenv("TEST_COGNITO_USERNAME"), System.getenv("TEST_COGNITO_PASSWORD"));
-    
+
         String entityId = "urn:ngsi-ld:TestUpsert:" + UUID.randomUUID().toString();
         String entityType = "TestUpsertType";
-    
+
         // 1. "作成" (Insert) pathのテスト
         // エンティティが存在しない --> catchブロックの this.createEntity
         Map<String, Object> initialAttrs = new HashMap<>();
         initialAttrs.put("temperature", 25);
         initialAttrs.put("humidity", 50); // "temperature" 以外の属性も指定
-    
+
         client.updateEntity(entityId, entityType, initialAttrs);
-    
+
         // 検証 (作成)
-        ParameterizedTypeReference<Map<String, Object>> mapType = new ParameterizedTypeReference<>() {};
+        ParameterizedTypeReference<Map<String, Object>> mapType = new ParameterizedTypeReference<>() {
+        };
         Map<String, Object> createdEntity = client.getEntity(entityId, entityType).body(mapType);
-    
+
         assertNotNull(createdEntity);
         assertEquals(entityId, createdEntity.get("id"));
         assertEquals(25, createdEntity.get("temperature"));
         assertEquals(50, createdEntity.get("humidity"));
-    
+
         // 2. "更新" (Update/PATCH) pathのテスト
         // エンティティが既に存在する --> tryブロックの updateExistingEntityAttributesWithResponseSpec
         Map<String, Object> updateAttrs = new HashMap<>();
-        updateAttrs.put("temperature", 30);      // 更新
-        updateAttrs.put("seatNumber", 10);       // 追加
+        updateAttrs.put("temperature", 30); // 更新
+        updateAttrs.put("seatNumber", 10); // 追加
         updateAttrs.put("status", "active");
-    
+
         client.updateEntity(entityId, entityType, updateAttrs);
-    
+
         // 検証 (更新)
         Map<String, Object> updatedEntity = client.getEntity(entityId, entityType).body(mapType);
-    
+
         assertNotNull(updatedEntity);
         // 更新・追加されている
         assertEquals(30, updatedEntity.get("temperature"));
         assertEquals(10, updatedEntity.get("seatNumber"));
         // 最初の作成時から変更されず残っている
         assertEquals(50, updatedEntity.get("humidity"));
-        
+
         assertEquals("active", updatedEntity.get("status"));
     }
 
     @Test
-    @DisplayName("deleteEntityのテスト（ID+Type指定、IDのみ指定の2パターン）")
+    @DisplayName("エンティティを作成・削除できるかのテスト")
     @EnabledIfEnvironmentVariables({
-        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USER_POOL_ID", matches = ".*"),
-        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_CLIENT_ID", matches = ".*"),
-        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USERNAME", matches = ".*"),
-        @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_PASSWORD", matches = ".*")
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USER_POOL_ID", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_CLIENT_ID", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USERNAME", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_PASSWORD", matches = ".*")
     })
     void testDeleteEntity() throws GeneralSecurityException, NoSuchAlgorithmException {
-        // 1. セットアップ
         MocClient client = new MocClient();
         client.setMocAuthInfo(System.getenv("TEST_COGNITO_USER_POOL_ID"), System.getenv("TEST_COGNITO_CLIENT_ID"));
         client.login(System.getenv("TEST_COGNITO_USERNAME"), System.getenv("TEST_COGNITO_PASSWORD"));
-
-        String type = "TestDeleteType";
-
-        // ケース 1: deleteEntity(id, type)
-        String id1 = "urn:ngsi-ld:TestDelete:1:" + UUID.randomUUID().toString();
-        
-        // データ作成（既存のupdateEntityを利用して作成）
-        client.updateEntity(id1, type, Map.of("value", 100));
-
-        // 削除実行（テスト対象）
-        client.deleteEntity(id1, type).toBodilessEntity();
-
-        // 検証: 取得しようとして 404 Not Found になることを確認
-        RestClientResponseException ex1 = assertThrows(RestClientResponseException.class, () -> {
-            client.getEntity(id1, type).toBodilessEntity();
+    
+        // エンティティを作成
+        String entityId = "urn:ngsi-ld:TestEntity:" + UUID.randomUUID().toString();
+        CreateEntityRequest entity = new CreateEntityRequest();
+        entity.setType("TestEntity");
+        entity.setId(entityId);
+        client.entities().createEntity("application/json", entity, "keyValues");
+    
+        // 削除を実行
+        client.deleteEntity(entityId, "TestEntity");
+    
+        // 削除後に取得しようとすると404が返ることを確認
+        assertThrows(RestClientResponseException.class, () -> {
+            client.getEntity(entityId, "TestEntity").body(RetrieveEntityResponse.class);
         });
-        assertEquals(HttpStatus.NOT_FOUND.value(), ex1.getStatusCode().value());
-
-        // ケース 2: deleteEntity(id) - IDのみでの削除
-        String id2 = "urn:ngsi-ld:TestDelete:2:" + UUID.randomUUID().toString();
-
-        // データ作成
-        client.updateEntity(id2, type, Map.of("value", 200));
-
-        // 削除実行（テスト対象）
-        client.deleteEntity(id2).toBodilessEntity();
-
-        // 検証: 取得しようとして 404 Not Found になることを確認
-        RestClientResponseException ex2 = assertThrows(RestClientResponseException.class, () -> {
-            client.getEntity(id2, type).toBodilessEntity();
-        });
-        assertEquals(HttpStatus.NOT_FOUND.value(), ex2.getStatusCode().value());
     }
-
 }

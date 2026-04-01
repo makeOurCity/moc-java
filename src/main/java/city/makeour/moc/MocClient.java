@@ -7,6 +7,11 @@ import java.util.Map;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import city.makeour.moc.ngsiv2.Ngsiv2Client;
 import city.makeour.ngsi.v2.api.EntitiesApi;
 import city.makeour.ngsi.v2.invoker.ApiClient;
@@ -149,38 +154,6 @@ public class MocClient {
         return this.entities().retrieveEntityWithResponseSpec(entityId, type, null, null, "keyValues");
     }
 
-    public ResponseSpec updateEntity(String id, String type, Map<String, Object> attributesToUpdate) {
-        if (id == null || id.isBlank()) throw new IllegalArgumentException("id is required");
-        if (type == null || type.isBlank()) throw new IllegalArgumentException("type is required");
-        if (attributesToUpdate == null) attributesToUpdate = java.util.Collections.emptyMap();
-    
-        try {
-            // Existence check
-            this.entities()
-                .retrieveEntityWithResponseSpec(id, type, null, null, "keyValues")
-                .toEntity(Object.class);
-
-            // Exists -> POST (keyValues 形式でそのまま送る)
-            return this.client.updateEntityAttributes(
-                id,
-                "application/json",
-                attributesToUpdate, // Object(Map) をそのまま PATCH
-                type,
-                "keyValues"
-            );
-
-        } catch (org.springframework.web.client.RestClientResponseException e) {
-            if (e.getStatusCode().value() != 404) throw e;
-
-            // Not found -> create (従来通り)
-            java.util.Map<String, Object> body = new java.util.HashMap<>();
-            body.put("id", id);
-            body.put("type", type);
-            body.putAll(attributesToUpdate);
-            return this.createEntity("application/json", body);
-        }   
-    }
-
     // 指定された ID と Type を持つEntityを削除
     public ResponseSpec deleteEntity(String entityId, String type) {
         if (entityId == null || entityId.isBlank()) {
@@ -195,8 +168,43 @@ public class MocClient {
         return this.deleteEntity(entityId, null);
     }
 
+    // Map版（メインロジック）
+    public ResponseSpec updateEntity(String id, String type, Map<String, Object> attributesToUpdate) {
+        if (id == null || id.isBlank()) throw new IllegalArgumentException("id is required");
+        if (type == null || type.isBlank()) throw new IllegalArgumentException("type is required");
+        if (attributesToUpdate == null) attributesToUpdate = java.util.Collections.emptyMap();
 
+        try {
+            this.entities()
+                .retrieveEntityWithResponseSpec(id, type, null, null, "keyValues")
+                .toEntity(Object.class);
 
+            return this.client.updateEntityAttributes(
+                id,
+                "application/json",
+                attributesToUpdate,
+                type,
+                "keyValues"
+            );
 
+        } catch (org.springframework.web.client.RestClientResponseException e) {
+            if (e.getStatusCode().value() != 404) throw e;
 
+            java.util.Map<String, Object> body = new java.util.HashMap<>();
+            body.put("id", id);
+            body.put("type", type);
+            body.putAll(attributesToUpdate);
+            return this.createEntity("application/json", body);
+        }   
+    }
+
+    // Object版（Mapに変換してMap版に委譲）
+    public ResponseSpec updateEntity(String id, String type, Object o) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        
+        Map<String, Object> m = mapper.convertValue(o, new TypeReference<Map<String, Object>>() {});
+        return updateEntity(id, type, m);
+    }
 }
