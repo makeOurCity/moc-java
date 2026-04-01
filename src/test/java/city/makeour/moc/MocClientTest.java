@@ -208,4 +208,33 @@ class MocClientTest {
 
         assertEquals("active", updatedEntity.get("status"));
     }
+
+    @Test
+    @DisplayName("エンティティを作成・削除できるかのテスト")
+    @EnabledIfEnvironmentVariables({
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USER_POOL_ID", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_CLIENT_ID", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_USERNAME", matches = ".*"),
+            @EnabledIfEnvironmentVariable(named = "TEST_COGNITO_PASSWORD", matches = ".*")
+    })
+    void testDeleteEntity() throws GeneralSecurityException, NoSuchAlgorithmException {
+        MocClient client = new MocClient();
+        client.setMocAuthInfo(System.getenv("TEST_COGNITO_USER_POOL_ID"), System.getenv("TEST_COGNITO_CLIENT_ID"));
+        client.login(System.getenv("TEST_COGNITO_USERNAME"), System.getenv("TEST_COGNITO_PASSWORD"));
+    
+        // エンティティを作成
+        String entityId = "urn:ngsi-ld:TestEntity:" + UUID.randomUUID().toString();
+        CreateEntityRequest entity = new CreateEntityRequest();
+        entity.setType("TestEntity");
+        entity.setId(entityId);
+        client.entities().createEntity("application/json", entity, "keyValues");
+    
+        // 削除を実行
+        client.deleteEntity(entityId, "TestEntity");
+    
+        // 削除後に取得しようとすると404が返ることを確認
+        assertThrows(RestClientResponseException.class, () -> {
+            client.getEntity(entityId, "TestEntity").body(RetrieveEntityResponse.class);
+        });
+    }
 }

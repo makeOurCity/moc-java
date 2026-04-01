@@ -154,6 +154,20 @@ public class MocClient {
         return this.entities().retrieveEntityWithResponseSpec(entityId, type, null, null, "keyValues");
     }
 
+    // 指定された ID と Type を持つEntityを削除
+    public ResponseSpec deleteEntity(String entityId, String type) {
+        if (entityId == null || entityId.isBlank()) {
+            throw new IllegalArgumentException("id is required");
+        }
+        // EntitiesApi に定義されている removeEntityWithResponseSpec を呼び出す
+        return this.entities().removeEntityWithResponseSpec(entityId, type);
+    }
+
+    // 指定された ID を持つEntityを削除
+    public ResponseSpec deleteEntity(String entityId) {
+        return this.deleteEntity(entityId, null);
+    }
+
     // Map版（メインロジック）
     public ResponseSpec updateEntity(String id, String type, Map<String, Object> attributesToUpdate) {
         if (id == null || id.isBlank()) throw new IllegalArgumentException("id is required");
@@ -193,8 +207,4 @@ public class MocClient {
         Map<String, Object> m = mapper.convertValue(o, new TypeReference<Map<String, Object>>() {});
         return updateEntity(id, type, m);
     }
-
-
-
-
 }
